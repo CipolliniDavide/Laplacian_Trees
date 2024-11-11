@@ -48,15 +48,15 @@ def plot_axes(ax, fig=None, geometry=(1,1,1)):
     ax = fig.axes.append(ax)
     return fig
 
-def set_legend(ax, title='', ncol=1, loc=0):
+def set_legend(ax, title='', ncol=1, loc=0, fontsize="large", title_fontsize='x-large'):
     import matplotlib as mpl
     myfont1 = mpl.font_manager.FontProperties(fname='/System/Library/Fonts/Supplemental/Arial Italic.ttf')
     myfont2 = mpl.font_manager.FontProperties(fname='/System/Library/Fonts/Supplemental/Arial Bold.ttf')
-    lg = ax.legend(fontsize="large", title=title, title_fontsize='x-large', ncol=ncol, loc=loc)
+    lg = ax.legend(fontsize=fontsize, title=title, title_fontsize=fontsize, ncol=ncol, loc=loc)
     for lh in lg.legendHandles:
         lh.set_alpha(1)
     title = lg.get_title()
-    title.set_fontsize('x-large')
+    title.set_fontsize(title_fontsize)
     title.set_weight('bold')
     # l.set_title(title=title, prop=myfont2)
 

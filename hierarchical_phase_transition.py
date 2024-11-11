@@ -8,6 +8,7 @@ import glob
 import igraph as ig
 import pickle
 import pandas as pd
+from matplotlib.pyplot import title
 from scipy.linalg import expm
 from scipy.sparse import csc_matrix, csr_array
 from scipy.sparse.linalg import expm as sparse_expm
@@ -18,11 +19,26 @@ from helpers_dataset.helpers_dataset import (order_files_by_r,
 import sys
 print(sys.getrecursionlimit())
 
-def plot_(x, y, yerr, n_nodes, fig_format='pdf', ylabel='Modularity', ylabel_var="$\mathbf{2m\cdot Var(Modularity)}$",
-          x_ticks=[0, .4, .9, 1, 1.5, 2], x_lim=(0, .95), name='modularity'):
+def plot_(x,
+          y,
+          yerr,
+          n_nodes,
+          fig_format='pdf',
+          ylabel='Modularity',
+          ylabel_var="$\mathbf{2m\cdot Var(Modularity)}$",
+          x_ticks=[],
+          x_lim=(0, .95),
+          name='modularity',
+          legend_title="N",
+          fontsize_ticks=20,
+          fontsize_labels=35,
+          fontsize_legend_title=30,
+          fontsize_legend=20
+          ):
     # fig, axes = plt.subplots(figsize=(9, 4), ncols=1, tight_layout=True)
     fig, ax1 = plt.subplots(figsize=(6, 4), ncols=1, tight_layout=True)
     ax2 = ax1.twinx()
+    [ax.tick_params(axis='both', which='major', length=7, width=2)  for ax in [ax1, ax2]]
 
     for i in range(len(y)):
         if len(y[i]) > len(x):
@@ -40,13 +56,22 @@ def plot_(x, y, yerr, n_nodes, fig_format='pdf', ylabel='Modularity', ylabel_var
     axes[1].set_ylabel(ylabel_var)
     axes[0].set_ylim([0.00, 1.01])
     axes[1].set_ylim(bottom=0.00)
-    [set_ticks_label(ax=ax, ax_type='x', ax_label='r', data=[0, 2], num=5, valfmt="{x:.1f}",
+    [set_ticks_label(ax=ax, ax_type='x', ax_label='r', data=[0, 2],
+                     num=5,
+                     valfmt="{x:.1f}",
+                     fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                     fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
                      ticks=x_ticks)
      for ax in axes]
     [ax.set_xlim(x_lim) for ax in axes]
-    [get_set_larger_ticks_and_labels(ax=ax) for ax in axes]
-    [ax.grid(axis='x') for ax in axes]
-    [set_legend(ax[0], loc=2) for ax in [axes]]
+    [set_ticks_label(ax=ax, ax_type='y', ax_label=ylab, data=[0, np.nanmax(d)], num=2, valfmt="{x:.1f}",
+                     fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                     fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                     )
+     for ax, d, ylab in zip(axes, [y, yerr], [ylabel, ylabel_var])]
+    # [get_set_larger_ticks_and_labels(ax=ax) for ax in axes]
+    # [ax.grid(axis='x') for ax in axes]
+    [set_legend(ax[0], loc=2, title=legend_title, fontsize=fontsize_legend, title_fontsize=fontsize_legend_title) for ax in [axes]]
     save_name_mod = save_fold + name
 
     fig.savefig(save_name_mod + f".{fig_format}", dpi=300)
@@ -210,18 +235,35 @@ if __name__ == '__main__':
           yerr=[var_modularity_list[i] * 2*(n_nodes[i]-1) for i in range(len(n_nodes))],
           n_nodes=n_nodes,
           fig_format=fig_format,
-          ylabel='Modularity', ylabel_var="$\mathbf{2m\cdot Var(Modularity)}$",
-          x_ticks=[0, .4, .9, 1, 1.5, 2], x_lim=(0, .95), name='modularity')
+          # ylabel='Modularity',
+          # ylabel_var="$\mathbf{2m\cdot Var(Modularity)}$",
+          ylabel='Q',
+          ylabel_var="$\mathbf{2m\cdot Var(Q)}$",
+          x_ticks=[0, .4, .9, 1, 1.5, 2],
+          x_lim=(0, .95),
+          fontsize_ticks=20,
+          fontsize_labels=25,
+          legend_title="N",
+          fontsize_legend_title=18,
+          fontsize_legend=18,
+          name='modularity')
 
     plot_(x=r_,
           y=[avg_hierarchy_list[i]/(n_nodes[i] - 1) for i in range(len(n_nodes))],
-          yerr=var_hierarchy_list,
+          # yerr=var_hierarchy_list,
+          yerr=[var_hierarchy_list[i]/(n_nodes[i] - 1) for i in range(len(n_nodes))],
           n_nodes=n_nodes,
           fig_format=fig_format,
           ylabel='$\mathbf{\hat{h}}$',
-          ylabel_var='$\mathbf{(N-1) \cdot Var(\hat{h})}$',
-          x_ticks=[0, .5, 1, 1.5, 2],
-          x_lim=(0, 2), name='hierarchy')
+          # ylabel_var='$\mathbf{(N-1) \cdot Var(\hat{h})}$',
+          ylabel_var='$\mathbf{Var(\hat{h})}$',
+          x_ticks=[0, 1, 2],
+          x_lim=(0, 2),
+          fontsize_ticks=20,
+          fontsize_labels=25,
+          fontsize_legend_title=18,
+          fontsize_legend=18,
+          name='hierarchy')
 
     #########################################################################################################
     # Diameter
@@ -249,11 +291,19 @@ if __name__ == '__main__':
 
     plot_(x=r_,
           y=[avg_diameter_list[i]/(n_nodes[i]-1) for i in range(len(n_nodes))],
-          yerr=var_diameter_list,
+          # yerr=var_diameter_list,
+          yerr=[var_diameter_list[i]/(n_nodes[i]-1) for i in range(len(n_nodes))],
           n_nodes=n_nodes,
           fig_format=fig_format,
           ylabel='$\mathbf{\hat{d}}$',
-          ylabel_var='(N-1)' + '$\mathbf{\cdot}$' + '$\mathbf{Var(\hat{d})}$',
-          x_ticks=[0, .5, 1, 1.5, 2], x_lim=(0, 2), name='diameter')
+          # ylabel_var='(N-1)' + '$\mathbf{\cdot}$' + '$\mathbf{Var(\hat{d})}$',
+          ylabel_var='$\mathbf{Var(\hat{d})}$',
+          fontsize_ticks=20,
+          fontsize_labels=25,
+          fontsize_legend_title=18,
+          fontsize_legend=18,
+          x_ticks=[0, 1, 2],
+          x_lim=(0, 2),
+          name='diameter')
 
 

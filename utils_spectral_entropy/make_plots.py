@@ -4,6 +4,7 @@ import numpy as np
 from helpers.visual_utils import set_ticks_label, set_legend, create_colorbar, get_set_larger_ticks_and_labels
 # from utils_spectral_entropy.utils import find_peaks_indices
 # from utils_spectral_entropy.spectral_entropy_numpy import specific_heat
+import matplotlib.ticker as ticker
 
 def plot_curves(tau_range: np.array,
                            networks_eta: np.array,
@@ -56,13 +57,24 @@ def plot_curves(tau_range: np.array,
         plt.close()
 
 
-
 def plot_von_neumann_ent(von_neumann_ent, tau_range,
                          save_name=None, spec_heat=None,
                          tau_star_list=[],
-                        figsize=(7, 5), labely='S', show=False, fig_format='.pdf',
-                         legend_title=None, take_average=False,
-                         ylim_ax2=(-.01, 1.5)):
+                         figsize=(7, 5),
+                         labely='S', show=False,
+                         fig_format='.pdf',
+                         legend_title=None,
+                         take_average=False,
+                         ylim_ax2=(-.01, 1.5),
+                         valfmt_spec_entropy="{x:.1f}",
+                         valfmt_spec_heat="{x:.2f}",
+                         fontsize_ticks=20,
+                         fontsize_labels=35,
+                         fontsize_legend_title=30,
+                         ticks_spec_heat=[.5, .66, 1],
+                         x_ticks=[10**0, 10**3, 10**6],
+                         grid_flag=False,
+                         ):
 
 
     fig, ax1 = plt.subplots(figsize=figsize, tight_layout=True)  # Change layout to tight_layout
@@ -74,11 +86,14 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
 
 
     # Plot von Neumann entropy on the primary y-axis
-    ax1.semilogx(tau_range, von_neumann_ent_to_plot, linewidth=2)  # , label=labely)
-    ax1.set_xlabel(r'$\mathbf{\tau}$')
-    get_set_larger_ticks_and_labels(ax=ax1)
-    set_ticks_label(ax=ax1, ax_type='y', num=3, ax_label=labely, data=von_neumann_ent_to_plot)
-    ax1.set_ylim(bottom=-.01, top=1.05)
+    ax1.semilogx(tau_range, von_neumann_ent_to_plot, linewidth=3)  # , label=labely)
+
+    set_ticks_label(ax=ax1, ax_type='y', num=2, ax_label=labely,
+                    valfmt=valfmt_spec_entropy,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    data=von_neumann_ent_to_plot)
+    ax1.set_ylim(bottom=-.01)#, top=1.05)
     if spec_heat is not None:
         # spec_heat = specific_heat(spec_ent=von_neumann_ent_to_plot, tau_range=tau_range, batch_dim=1)
         # Create a second y-axis on the left for specific heat
@@ -89,18 +104,22 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
             spec_heat = spec_heat.mean(axis=1)
             # Add shaded area representing standard deviation
             ax2.fill_between(tau_range, spec_heat - std_dev, spec_heat + std_dev, alpha=0.3, color='red')
-        ax2.semilogx(tau_range, spec_heat, color='red', linewidth=2)
+        ax2.semilogx(tau_range, spec_heat, color='red', linewidth=3)
         # tau_of_lastpeak_list = tau_range[find_peaks_indices(x_array=tau_range, y_array=spec_heat, eps=eps_tau_star, atol=atol)]
         # for t in tau_star_list:
         for t, c in zip(tau_star_list, ['green', 'blue']):
-            ax2.axvline(t, color='purple', linestyle='--', linewidth=3, alpha=.7, c=c)
+            ax2.axvline(t, color='purple', linestyle='--', linewidth=2.5, alpha=.5, c=c)
             # ax3.text(t, ax1.get_ylim()[0], f"{t:.0f}", va='top', ha='center', color='gray')  # Add text box
         # ax2.tick_params(axis='y', labelcolor='red', color='red')
         ax2.set_ylabel(r'$\mathbf{C_{\tau}}$', color='red')
         num_ticks_y = 3
-        # get_set_larger_ticks_and_labels(ax=ax2, num_ticks_y=num_ticks_y)
-        set_ticks_label(ax=ax2, ax_type='y', num=num_ticks_y, data=spec_heat, ax_label=r'$\mathbf{C_{\tau}}$', color_label='red',
-                        ticks=[.5, .66, 1])
+        get_set_larger_ticks_and_labels(ax=ax2, num_ticks_y=num_ticks_y)
+        set_ticks_label(ax=ax2, ax_type='y', num=num_ticks_y, data=spec_heat, ax_label=r'$\mathbf{C_{\tau}}$',
+                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                        valfmt=valfmt_spec_heat,
+                        fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                        color_label='red',
+                        ticks=ticks_spec_heat)
         ax2.set_ylim(bottom=ylim_ax2[0], top=ylim_ax2[1])
 
         # ax.legend(loc='upper left')
@@ -111,9 +130,24 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
         # ax3.xaxis.tick_top()  # Move ticks to the top
         # ax3.tick_params(axis='x', labelcolor='gray')  # Adjust tick color
 
+    # get_set_larger_ticks_and_labels(ax=ax1)
+    set_ticks_label(ax=ax1,
+                    ax_type='x',
+                    ticks=x_ticks,
+                    ax_label=r'$\mathbf{\tau}$',
+                    valfmt=valfmt_spec_entropy,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    data=tau_range)
+    # Customize tick parameters for larger and longer ticks on both axes
+    ax1.tick_params(axis='both', which='major', length=10, width=2)  # Major ticks
+    ax1.tick_params(axis='both', which='minor', length=5, width=1.5)  # Minor ticks
+    ax1.get_xaxis().set_major_formatter(ticker.LogFormatterMathtext(base=10))  # Use scalar format for readability
+
     # plt.title(tau_star)
-    ax1.grid(True, which='both', axis='x')
-    set_legend(ax=ax1, title=legend_title)
+    if grid_flag:
+        ax1.grid(True, which='both', axis='x')
+    set_legend(ax=ax1, title=legend_title, fontsize=fontsize_ticks, title_fontsize=fontsize_legend_title)
 
     # plt.show()
     # plt.close()
@@ -124,7 +158,7 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
         plt.show()
     else:
         plt.close()
-    a=0
+
 
 def plot_thermo_trajectory(tau_range: np.array,
                            networks_eta: np.array,
@@ -224,8 +258,10 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                                    valfmt_x = "{x:.1f}",
                                     valfmt_y="{x:.1f}",
                                     cbar_ticks=None,
-                                    legend_loc=4
-                                            ):
+                                    legend_loc=4,
+                                    ticks_size: float = 35,
+                                    label_size: float = 40
+                                    ):
 
     # x_ticks = np.arange(0.1, .9, .1)
     # valfmt_x = "{x:.1f}"
@@ -247,11 +283,15 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     add_ticks=add_yticks_heat,
                     valfmt=valfmt_y,
                     ticks=None,
-                    only_ticks=False, tick_lab=None,
-                    fontdict_ticks_label={'weight': 'bold', 'size': 'x-large'}, label_pad=4,
+                    only_ticks=False,
+                    tick_lab=None,
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
+                    label_pad=4,
                     ax_label=r'$\mathbf{\log_{10}{\tau}}$',
-                    fontdict_label={'weight': 'bold', 'size': 'xx-large', 'color': 'black'}, scale=None,
+                    scale=None,
                     )
+
     set_ticks_label(ax=ax1, ax_type='x',
                     # data=np.log10(tau_range),
                     data=x_ticks,
@@ -259,9 +299,11 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     valfmt=valfmt_x,
                     ticks=x_ticks,
                     only_ticks=False, tick_lab=None,
-                    fontdict_ticks_label={'weight': 'bold', 'size': 'x-large'}, label_pad=4,
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
+                    label_pad=4,
                     ax_label=r'$\mathbf{r}$',
-                    fontdict_label={'weight': 'bold', 'size': 'xx-large', 'color': 'black'}, scale=None,
+                    scale=None,
                     add_ticks=[])
     # get_set_larger_ticks_and_labels(ax=ax1, num_ticks_x=num_xticks)
     create_colorbar(fig=fig, ax=ax1, mapp=map,
@@ -269,8 +311,13 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     # array_of_values=networks_eta,
                     valfmt=valfmt_cbar,
                     cbar_edg_ticks=cbar_ticks,
-                    fontdict_cbar_label={'label': y_label},
-                    fontdict_cbar_tickslabel=None, fontdict_cbar_ticks=None, position='right')
+                    fontdict_cbar_label={'label': y_label, "fontsize": label_size, 'fontweight': 'bold'},
+                    fontdict_cbar_tickslabel={"fontsize": ticks_size, 'fontweight': 'bold'},
+                    fontdict_cbar_ticks=None,
+                    # fontdict_cbar_label={'label': y_label},
+                    # fontdict_cbar_tickslabel=None,
+                    # fontdict_cbar_ticks=None,
+                    position='right')
     plt.savefig('{:s}/heatmap_{:s}.{:s}'.format(save_dir, fig_name, fig_format), dpi=300)
 
 
@@ -665,7 +712,12 @@ def plot_quantity_along_transition(quantity,
                                    fig_name: str = '',
                                    color: str = 'green',
                                    marker: str = 'o',
-                                   save_dir: str = '', fig_format: str='png', marker_size: float=45, y_lim=(0, 1),
+                                   fontsize_ticks=20,
+                                   fontsize_labels=30,
+                                   save_dir: str = '',
+                                   fig_format: str='png',
+                                   marker_size: float=45,
+                                   y_lim=(0, 1),
                                    x_ticks=None):
     if x_ticks is None:
         x_ticks = r_[::2]
@@ -677,19 +729,28 @@ def plot_quantity_along_transition(quantity,
     # ax.set_ylabel(ylabel)
     # if y_lim:
     #     ax.set_ylim(y_lim[0], y_lim[1])
-    set_ticks_label(ax=ax, ax_type='y', data=[y_lim[0], y_lim[1]], num=5, valfmt="{x:.2f}", #ticks=r[::2],
+    set_ticks_label(ax=ax,
+                    ax_type='y',
+                    data=[y_lim[0], y_lim[1]],
+                    num=3,
+                    valfmt="{x:.1f}",
+                    #ticks=r[::2],
                     only_ticks=False, tick_lab=None,
-                    fontdict_ticks_label={'weight': 'bold', 'size': 'x-large'}, label_pad=4,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    label_pad=4,
                     ax_label=ylabel,
-                    fontdict_label={'weight': 'bold', 'size': 'xx-large', 'color': 'black'}, scale=None,
+                    scale=None,
                     add_ticks=[])
 
     # get_set_larger_ticks_and_labels(ax=ax, num_ticks_x=10)
     set_ticks_label(ax=ax, ax_type='x', data=r_, num=10, valfmt="{x:.1f}", ticks=x_ticks,
                     only_ticks=False, tick_lab=None,
-                    fontdict_ticks_label={'weight': 'bold', 'size': 'x-large'}, label_pad=4,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    label_pad=4,
                     ax_label=r'$\mathbf{r}$',
-                    fontdict_label={'weight': 'bold', 'size': 'xx-large', 'color': 'black'}, scale=None,
+                    scale=None,
                     add_ticks=[])
     if std_quantity is None:
         pass
@@ -699,14 +760,15 @@ def plot_quantity_along_transition(quantity,
         set_ticks_label(ax=ax2, ax_type='y', data=std_quantity, num=3, valfmt="{x:.1f}",  # ticks=r[::2],
                         only_ticks=False,
                         tick_lab=None,
-                        fontdict_ticks_label={'weight': 'bold', 'size': 'x-large'}, label_pad=4,
+                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                        fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
                         ax_label=ylabel_std_quantity,
-                        fontdict_label={'weight': 'bold', 'size': 'xx-large', 'color': 'black'}, scale=None,
+                        scale=None,
                         add_ticks=[])
         ax.set_ylim(bottom=-.02)
         ax2.set_ylim(bottom=-2)
     # set_legend(ax=ax)
-    ax.grid()
+    # ax.grid()
     plt.savefig(f'{save_dir}/{fig_name}.{fig_format}')
 
 

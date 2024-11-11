@@ -7,18 +7,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from glob import glob
+
 import torch
 import networkx as nx
 
 
-from degree_figures import plot_table_of_degree_distribution
+# from degree_figures import plot_table_of_degree_distribution
 from helpers.utils import unroll_nested_list, ensure_dir
 from helpers.visual_utils import set_ticks_label, set_legend, create_colorbar, get_set_larger_ticks_and_labels, scientific_notation
 from helpers_dataset.helpers_dataset import (order_files_by_r, read_csv_convert_to_dataframe, create_dataset_Portegys,
                                              load_key_by_, check_dataset,
                                              plot_algorithmic_accuracy, plot_ntw_properties, filter_file_list)
-from utils_spectral_entropy.spectral_entropy import (compute_dense_batch_von_neumann_entropy, von_neumann_entropy_numpy,
-                                                     specific_heat, entropy_var_ensemble)
+from utils_spectral_entropy.spectral_entropy_numpy import (von_neumann_entropy_numpy,
+                                                           specific_heat, entropy_var_ensemble)
 from utils_spectral_entropy.utils import find_peaks_indices
 from utils_spectral_entropy.thermo_efficiency import thermo_trajectory, thermo_efficiency_by_key
 from utils_spectral_entropy.make_plots import (plot_von_neumann_ent, plot_thermo_trajectory, plot_thermo_trajectory_separate,
@@ -183,24 +184,54 @@ if  __name__ == "__main__":
      critical_entropy_firstpeak, critical_entropy_lastpeak, critical_entropy_maxpeak,
      spec_heat_firstpeak, spec_heat_lastpeak, spec_heat_maxpeak, entropy_save, C_save) = get_tau_max_specific_heat(spectrum=spectrum, r_list=r_,
                                                                                                                    tau_range=tau_range,
-                                                                                                                   save_fig_spectrum_vne=save_fig_spectrum_vne, plot_vne=True)
+                                                                                                                   save_fig_spectrum_vne=save_fig_spectrum_vne,
+                                                                                                                   plot_vne=False)
+
+    # Loop over each unique eta value to compute the mean for entropy and specific heat
+    for idx, r in enumerate(r_):
+        plot_von_neumann_ent(von_neumann_ent=entropy_ensemble[:, idx, :].T,
+                             tau_range=tau_range,
+                             # tau_of_lastpeak_list=1/np.sort(spectrum, axis=1)[:, 1],
+                             tau_star_list=[tau_range[mask_of_peaks_list[idx]].max(),
+                                            tau_range[mask_of_peaks_list[idx]].min()],
+                             spec_heat=chi[:, idx, :].T,
+                             ylim_ax2=(-.01, 2.),
+                             labely=r'$\mathbf{S_{\tau}}$',
+                             take_average=True,
+                             legend_title=r'$\mathbf{\eta}$' + '={:.2f}'.format(r),
+                             show=args.verbose,
+                             fig_format=f'{args.fig_format}',
+                             fontsize_ticks=30,
+                             fontsize_labels=40,
+                             fontsize_legend_title=35,
+                             ticks_spec_heat=[0., .66, 1],
+                             x_ticks=[1, 10 ** 3, 10 ** 6],
+                             valfmt_spec_entropy="{x:.1f}",
+                             valfmt_spec_heat="{x:.2f}",
+                             grid_flag=False,
+                             figsize=(8, 5),
+                             save_name='{:s}ent_eta{:05.2f}'.format(save_fig_spectrum_vne, r))
+        plt.close()
+
     entropy_between_peaks = np.zeros((args.max_iter, len(r_)))
     for ind_r, _ in enumerate(r_):
         entropy_between_peaks[:, ind_r] = entropy_ensemble[:, ind_r, min(mask_of_peaks_list[ind_r])] - entropy_ensemble[:, ind_r, max(mask_of_peaks_list[ind_r])]
 
 
-    plot_quantity_along_transition(r_=r_,
-                                   y_lim=(0, n_nodes*entropy_between_peaks.var(0).max()),
-                                   quantity=n_nodes*entropy_between_peaks.var(0),
-                                   figsize=(8, 5),
-                                   # x_ticks=r_[::6],
-                                   x_ticks=[0, .2, .4, 1, 1.5, 2],
-                                   color='black',
-                                   marker='o',
-                                   fig_name='Varbetween_critical_entropy',
-                                   fig_format=args.fig_format,
-                                   ylabel=r'$\mathbf{N \cdot Var[S(\tau^{(1)}_{peak}) - S(\tau^{(2)}_{peak})]}$',
-                                   save_dir=save_fig_spectrum)
+    # plot_quantity_along_transition(r_=r_,
+    #                                y_lim=(0, n_nodes*entropy_between_peaks.var(0).max()),
+    #                                quantity=n_nodes*entropy_between_peaks.var(0),
+    #                                figsize=(8, 5),
+    #                                # x_ticks=r_[::6],
+    #                                x_ticks=[0, .2, .4, 1, 1.5, 2],
+    #                                fontsize_labels=30,
+    #                                fontsize_ticks=25,
+    #                                color='black',
+    #                                marker='o',
+    #                                fig_name='Varbetween_critical_entropy',
+    #                                fig_format=args.fig_format,
+    #                                ylabel=r'$\mathbf{N \cdot Var[S(\tau^{(1)}_{peak}) - S(\tau^{(2)}_{peak})]}$',
+    #                                save_dir=save_fig_spectrum)
 
     plot_quantity_along_transition(r_=r_,
                                    quantity=np.array(critical_entropy_firstpeak) - np.array(critical_entropy_lastpeak),
@@ -208,13 +239,14 @@ if  __name__ == "__main__":
                                    ylabel_std_quantity=r"$\mathbf{N \cdot Var}$",
                                    figsize=(8, 5),
                                    # x_ticks=r_[::6],
-                                   x_ticks=[0, .2, .4, 1, 1.5, 2],
+                                   x_ticks=[0, .35, 1, 1.5, 2],
                                    color='black',
                                    marker='o',
                                    fig_name='between_critical_entropy',
                                    fig_format=args.fig_format,
                                    ylabel=r'$\mathbf{S^{(1)}_{peak} - S^{(2)}_{peak}}$',
-                                   save_dir=save_fig_spectrum)
+                                   save_dir=save_fig_spectrum,
+                                   )
 
     plot_quantity_along_transition(r_=r_, quantity=critical_entropy_lastpeak, figsize=(8, 5),
                                    x_ticks=r_[::4],
@@ -258,6 +290,9 @@ if  __name__ == "__main__":
                                     add_yticks_heat=[np.log10(10), np.log10(100)],
                                     y_label='F',
                                     save_dir=save_fig_spectrum,
+                                    cbar_ticks=[0, F.max()],
+                                    ticks_size=30,
+                                    label_size=40,
                                     figsize=(8, 5),
                                     title='',
                                     num_xticks=len(r_) // 2,
@@ -286,9 +321,13 @@ if  __name__ == "__main__":
                                     heat_num_yticks=2,
                                     x_ticks=r_[::4],
                                     valfmt_cbar="{x:.3f}",
+                                    cbar_ticks=[0, F.var(axis=0).max()],
+                                    ticks_size=30,
+                                    label_size=40,
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
+
                                     )
 
     plot_thermo_trajectory_separate(tau_range=tau_range,
@@ -305,8 +344,11 @@ if  __name__ == "__main__":
                                     # tau_lim=(.1, 1e6),
                                     tau_lim=(.01, 1e6),
                                     x_ticks=r_[::4],
+                                    cbar_ticks=[0, chi.max()],
                                     number_of_curves=10,
                                     heat_num_yticks=2,
+                                    ticks_size=20,
+                                    label_size=30,
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
