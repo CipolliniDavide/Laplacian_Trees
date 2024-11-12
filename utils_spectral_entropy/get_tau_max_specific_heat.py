@@ -6,7 +6,7 @@ from utils_spectral_entropy.spectral_entropy_numpy import von_neumann_entropy_nu
 from utils_spectral_entropy.make_plots import plot_von_neumann_ent
 
 
-def get_tau_max_specific_heat(spectrum, tau_range, r_list, plot_vne=False, verbose=False, fig_format='png', save_fig_spectrum_vne='./vne/'):
+def get_tau_max_specific_heat(spectrum, tau_range, r_list):
     tau_error_peak_list = []
 
     tau_firstpeak = []
@@ -64,27 +64,6 @@ def get_tau_max_specific_heat(spectrum, tau_range, r_list, plot_vne=False, verbo
         # critical_entropy.append(entropy.mean(axis=1)[np.min(mask)])
         spec_heat_c.append(C.mean(axis=1)[mask.min()])
 
-        if plot_vne:
-            plot_von_neumann_ent(von_neumann_ent=entropy, tau_range=tau_range,
-                                 # tau_of_lastpeak_list=1/np.sort(spectrum, axis=1)[:, 1],
-                                 tau_star_list=[tau_range[mask].max(), tau_range[mask].min()],
-                                 spec_heat=C,
-                                 ylim_ax2=(-.01, 3.),
-                                 labely=r'$\mathbf{S_{\tau}}$',
-                                 take_average=True,
-                                 legend_title='r={:.2f}'.format(key),
-                                 show=verbose,
-                                 fig_format=f'{fig_format}',
-                                 save_name='{:s}ent_r{:05.2f}'.format(save_fig_spectrum_vne, key))
-            plt.close()
-
-        # a=0
-        # F = -np.log(Z)
-        # plot_von_neumann_ent(von_neumann_ent_to_plot=F, tau_range=tau_range, labely=r'$\mathbf{F_{\tau}}$',
-        #                      legend_title=f'r={str(key)}', show=True, fig_format=f'{args.fig_format}',
-        #                      save_name='{:s}free_ener_r{:s}'.format(save_fig_vne, str(key)))
-        # plt.close()
-    # tau_star = np.array(unroll_nested_list(tau_of_lastpeak_list))
 
     return (mask_list, tau_firstpeak, tau_lastpeak, mask_max_list, tau_maxpeak,
             critical_entropy_firstpeak, critical_entropy_lastpeak, critical_entropy_maxpeak,

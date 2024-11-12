@@ -231,7 +231,12 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
                               vbar_max_acc: bool=False,
                               x_ticks=None,
                               ylim_theta=None,
-                              ylim_acc =None    ):
+                              ylim_acc =None,
+                              fontsize_ticks=20,
+                              fontsize_labels=35,
+                              fontsize_legend_title=30,
+                              ):
+
     if (r_range[0] is not None) and (r_range[1] is not None):
         df = df[(df['R'] >= r_range[0]) & (df['R'] <= r_range[1])]
 
@@ -268,11 +273,20 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
 
         if key == 'Accu':
             ax.set_ylim(ylim_acc)
-        get_set_larger_ticks_and_labels(ax=ax)
-        ax.set_ylabel(lab,  fontsize=fontsize)
+        # get_set_larger_ticks_and_labels(ax=ax)
+        # ax.set_ylabel(lab,  fontsize=fontsize)
+        set_ticks_label(ax=ax, ax_label=lab, valfmt=valfmt_x, ax_type='y', data=grouped_avg[key],
+                        num=2,
+                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                        fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                        )
+
         # ax.set_xlabel(r'$\mathbf{r}$', fontsize=fontsize)
-        set_ticks_label(ax=ax, ax_label=r'$\mathbf{r}$', ticks=x_ticks, valfmt=valfmt_x, ax_type='x', data=r)
-        ax.grid(True, which='both', axis='x')
+        set_ticks_label(ax=ax, ax_label=r'$\mathbf{r}$', ticks=x_ticks + r[np.argmax(trade_off)], valfmt=valfmt_x, ax_type='x', data=r,
+                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                        fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                        )
+        # ax.grid(True, which='both', axis='x')
         # set_legend(ax=ax, title=f'r={legend_title}')
         if vbar_max_eff:
             ax.axvline(x=r[np.argmax(trade_off)], linestyle='--', linewidth=3, color='red')
@@ -321,11 +335,30 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
 
     shadow_intersct_area(ax=ax, r=r, trade_off=trade_off, trade_off_error=trade_off_error)
     # ax.plot(r, trade_off_tpu, linewidth=3, marker='o', color='purple')
-    ax.set_ylabel(r'$\mathbf{\theta}$', fontsize=fontsize)
-    get_set_larger_ticks_and_labels(ax=ax)
-    # ax.set_xlabel(r'$\mathbf{r}$', fontsize=fontsize)
-    set_ticks_label(ax=ax, ax_label=r'$\mathbf{r}$', ticks=x_ticks, valfmt=valfmt_x, ax_type='x', data=r)
-    ax.grid(True, which='both', axis='x')
+    # ax.set_ylabel(r'$\mathbf{\theta}$', fontsize=fontsize)
+    # get_set_larger_ticks_and_labels(ax=ax)
+
+    set_ticks_label(ax=ax,
+                    ax_label="r",
+                    ticks=x_ticks+[r[np.argmax(trade_off)]],
+                    valfmt=valfmt_x,
+                    ax_type='x',
+                    data=r,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    )
+    set_ticks_label(ax=ax,
+                    ax_label=r'$\mathbf{\theta}$',
+                    valfmt=valfmt_x,
+                    ax_type='y',
+                    ticks=[ylim_theta[0], ylim_theta[1]] if ylim_theta is not None else None,
+                    data=trade_off,
+                    num=2,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    )
+
+    # ax.grid(True, which='both', axis='x')
     ax.set_xlim(left=0)
     if ylim_theta is not None:
         ax.set_ylim(ylim_theta)

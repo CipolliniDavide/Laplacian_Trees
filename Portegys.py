@@ -15,7 +15,7 @@ from utils_spectral_entropy.spectral_entropy_numpy import (specific_heat, entrop
 from utils_spectral_entropy.thermo_efficiency import thermo_efficiency_by_key
 from utils_spectral_entropy.make_plots import (plot_thermo_trajectory, plot_thermo_trajectory_separate,
                                                plot_eta_curves, plot_quantity_along_transition,
-                                               plot_eta_dS_dF, plot_surface, plot_tau_vs_r)
+                                               plot_eta_dS_dF, plot_surface, plot_tau_vs_r, plot_von_neumann_ent)
 from utils_spectral_entropy.ensamble_average import ensamble_avarage
 from utils_spectrum.plot_eigen import plot_eigen
 from utils_spectral_entropy.get_tau_max_specific_heat import get_tau_max_specific_heat
@@ -98,7 +98,7 @@ if  __name__ == "__main__":
                               fig_name='{:s}_alg_efficiency'.format(dataset_name),
                               fig_format=args.fig_format,
                               fig_size=(18, 4),
-                              x_ticks=np.arange(0.1, .9, .1),
+                              x_ticks=[.1, .9],
                               valfmt_x="{x:.1f}",
                               x_tick_every=2,
                               show=args.verbose,
@@ -193,9 +193,36 @@ if  __name__ == "__main__":
             chi[it_index, r_ind] = np.clip(a_min=0, a_max=1e15, a=specific_heat(spec_ent=ent, tau_range=tau_range, batch_dim=1))
     (mask_of_peaks_list, tau_firstpeak, tau_lastpeak, mask_max_list, tau_maxpeak,
      critical_entropy_firstpeak, critical_entropy_lastpeak, critical_entropy_maxpeak,
-     spec_heat_firstpeak, spec_heat_lastpeak, spec_heat_maxpeak, entropy_save, C_save) = get_tau_max_specific_heat(spectrum=spectrum, r_list=r_, tau_range=tau_range,
-                                                                                                                   plot_vne=True, save_fig_spectrum_vne=save_fig_spectrum_vne
+     spec_heat_firstpeak, spec_heat_lastpeak, spec_heat_maxpeak, entropy_save, C_save) = get_tau_max_specific_heat(spectrum=spectrum,
+                                                                                                                   r_list=r_,
+                                                                                                                   tau_range=tau_range,
                                                                                                                    )
+
+    # Loop over each unique eta value to compute the mean for entropy and specific heat
+    for idx, r in enumerate(r_):
+        plot_von_neumann_ent(von_neumann_ent=entropy_ensemble[:, idx, :].T/entropy_ensemble.max(),
+                             valfmt_spec_entropy="{x:.0f}",
+                             tau_range=tau_range,
+                             # tau_of_lastpeak_list=1/np.sort(spectrum, axis=1)[:, 1],
+                             tau_star_list=[tau_range[mask_of_peaks_list[idx]].max(),
+                                            tau_range[mask_of_peaks_list[idx]].min()],
+                             spec_heat=chi[:, idx, :].T,
+                             ylim_ax2=(-.01, 2.),
+                             labely=r'$\mathbf{S_{\tau}}$',
+                             take_average=True,
+                             legend_title='r={:.2f}'.format(r),
+                             show=args.verbose,
+                             fig_format=f'{args.fig_format}',
+                             fontsize_ticks=26,
+                             fontsize_labels=40,
+                             fontsize_legend_title=35,
+                             ticks_spec_heat=[.5, .66, 1],
+                             x_ticks=[10, 10 ** 3, 10 ** 6],
+                             valfmt_spec_heat="{x:.2f}",
+                             grid_flag=True,
+                             figsize=(8, 5),
+                             save_name='{:s}ent_eta{:05.2f}'.format(save_fig_spectrum_vne, r))
+        plt.close()
 
     # tau_lim = (1e0, 5e0)
     # tau_index = np.where((tau_range > tau_lim[0]) & (tau_range < tau_lim[1]))[0][::20]
@@ -268,6 +295,11 @@ if  __name__ == "__main__":
                                     tau_lim=(1, 1e5),
                                     number_of_curves=10,
                                     heat_num_yticks=2,
+                                    # x_ticks=[.1, r_[np.array(tau_firstpeak)-np.array(tau_lastpeak) == 0][-1]+.1, .6, .8],
+                                    x_ticks=[.1, .4, .6, .8],
+                                    cbar_ticks=[0, 1.3, .66],
+                                    ticks_size=30,
+                                    label_size=38,
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
@@ -502,8 +534,17 @@ if  __name__ == "__main__":
 
 
     ####################################### Plot surface of S, C, U ####################################################
-    plot_tau_vs_r(r_=r_, tau_lastpeak=np.array(tau_lastpeak), tau_firstpeak=np.array(tau_firstpeak), spectrum=spectrum,
-                  save_dir=save_fig_spectrum, fig_format=args.fig_format, y_lim=(.3, 1e5),
+    plot_tau_vs_r(r_=r_, tau_lastpeak=np.array(tau_lastpeak),
+                  tau_firstpeak=np.array(tau_firstpeak),
+                  spectrum=spectrum,
+                  save_dir=save_fig_spectrum,
+                  fig_format=args.fig_format,
+                  y_lim=(.3, 1e5),
+                  # x_ticks=[.1, +.1, .6, .8],
+                  x_ticks=[.1, .4, .6, .8],
+                  fontsize_ticks=25,
+                  fontsize_labels=32,
+                  valfmt_x="{x:.1f}",
                   show=args.verbose)
                   # show=True)
 
@@ -779,6 +820,12 @@ if  __name__ == "__main__":
                                         fig_format=args.fig_format,
                                         show=args.verbose,
                                         heat_num_yticks=2,
+                                        # x_ticks=[.1, r_[np.array(tau_firstpeak) - np.array(tau_lastpeak) == 0][-1] + .1,
+                                        #          .8],
+                                        x_ticks=[.1, .4, .6, .8],
+                                        # cbar_ticks=[0, 1.3, .66],
+                                        ticks_size=30,
+                                        label_size=38,
                                         add_yticks_heat=[np.log10(10), np.log10(100)],
                                         )
 
@@ -835,7 +882,8 @@ if  __name__ == "__main__":
     else:
         tau_lim = (9, 9e1)
         # tau_lim = (10, 9e1)
-    plot_thermo_trajectory_separate(tau_range=tau_range, r=r_,
+    plot_thermo_trajectory_separate(tau_range=tau_range,
+                                    r=r_,
                                     networks_eta=np.clip(a=networks_eta_avg, a_min=0, a_max=1),
                                     save_dir=f'{save_fig_spectrum}/',
                                     figsize=(8.5, 5.5),
@@ -844,11 +892,21 @@ if  __name__ == "__main__":
                                     num_xticks=len(r_) // 2,
                                     tau_lim=tau_lim,
                                     number_of_curves=10,
+                                    # x_ticks=[.1, r_[np.array(tau_firstpeak) - np.array(tau_lastpeak) == 0][-1] + .1, .6,
+                                    #          .8],
+                                    x_ticks=[.1, .4, .6, .8],
+                                    # cbar_ticks=[0, 1],
+                                    ticks_size=30,
+                                    label_size=38,
+                                    valfmt_cbar="{x:.0f}",
+                                    legend_flag=False,
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
                                     )
-    plot_thermo_trajectory(tau_range=tau_range, r=r_,
+
+    plot_thermo_trajectory(tau_range=tau_range,
+                           r=r_,
                            # networks_eta=networks_eta_avg,
                            networks_eta=np.clip(a=networks_eta_avg, a_min=0, a_max=1),
                            save_dir=f'{save_fig_spectrum}/',

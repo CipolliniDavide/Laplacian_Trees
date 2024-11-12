@@ -29,7 +29,7 @@ from utils_spectral_entropy.ensamble_average import ensamble_avarage, ensamble_a
 from utils_degree.degree_distribution import compare_bar_plot
 from utils_spectrum.plot_eigen import plot_eigen, plot_propagator, plot_propagator_eigenvalues
 from utils_spectral_entropy.get_tau_max_specific_heat import get_tau_max_specific_heat
-
+import matplotlib.ticker as ticker
 
 
 rng = np.random.default_rng(1)
@@ -182,14 +182,15 @@ if  __name__ == "__main__":
             chi[it_index, r_ind] = np.clip(a_min=0, a_max=1e15, a=specific_heat(spec_ent=ent, tau_range=tau_range, batch_dim=1))
     (mask_of_peaks_list, tau_firstpeak, tau_lastpeak, mask_max_list, tau_maxpeak,
      critical_entropy_firstpeak, critical_entropy_lastpeak, critical_entropy_maxpeak,
-     spec_heat_firstpeak, spec_heat_lastpeak, spec_heat_maxpeak, entropy_save, C_save) = get_tau_max_specific_heat(spectrum=spectrum, r_list=r_,
-                                                                                                                   tau_range=tau_range,
-                                                                                                                   save_fig_spectrum_vne=save_fig_spectrum_vne,
-                                                                                                                   plot_vne=False)
+     spec_heat_firstpeak, spec_heat_lastpeak, spec_heat_maxpeak, entropy_save, C_save) = get_tau_max_specific_heat(spectrum=spectrum,
+                                                                                                                   r_list=r_,
+                                                                                                                   tau_range=tau_range
+                                                                                                                   )
 
     # Loop over each unique eta value to compute the mean for entropy and specific heat
     for idx, r in enumerate(r_):
-        plot_von_neumann_ent(von_neumann_ent=entropy_ensemble[:, idx, :].T,
+        plot_von_neumann_ent(von_neumann_ent=entropy_ensemble[:, idx, :].T/entropy_ensemble.max(),
+                             valfmt_spec_entropy="{x:.0f}",
                              tau_range=tau_range,
                              # tau_of_lastpeak_list=1/np.sort(spectrum, axis=1)[:, 1],
                              tau_star_list=[tau_range[mask_of_peaks_list[idx]].max(),
@@ -198,17 +199,16 @@ if  __name__ == "__main__":
                              ylim_ax2=(-.01, 2.),
                              labely=r'$\mathbf{S_{\tau}}$',
                              take_average=True,
-                             legend_title=r'$\mathbf{\eta}$' + '={:.2f}'.format(r),
+                             legend_title='r={:.2f}'.format(r),
                              show=args.verbose,
                              fig_format=f'{args.fig_format}',
-                             fontsize_ticks=30,
+                             fontsize_ticks=26,
                              fontsize_labels=40,
                              fontsize_legend_title=35,
-                             ticks_spec_heat=[0., .66, 1],
-                             x_ticks=[1, 10 ** 3, 10 ** 6],
-                             valfmt_spec_entropy="{x:.1f}",
+                             ticks_spec_heat=[.5, .66, 1],
+                             x_ticks=[10, 10 ** 5], #, 10 ** 6],
                              valfmt_spec_heat="{x:.2f}",
-                             grid_flag=False,
+                             grid_flag=True,
                              figsize=(8, 5),
                              save_name='{:s}ent_eta{:05.2f}'.format(save_fig_spectrum_vne, r))
         plt.close()
@@ -233,22 +233,29 @@ if  __name__ == "__main__":
     #                                ylabel=r'$\mathbf{N \cdot Var[S(\tau^{(1)}_{peak}) - S(\tau^{(2)}_{peak})]}$',
     #                                save_dir=save_fig_spectrum)
 
+    x_ticks_for_plots = [.1, .4, .8, 1.2, 2.]
     plot_quantity_along_transition(r_=r_,
                                    quantity=np.array(critical_entropy_firstpeak) - np.array(critical_entropy_lastpeak),
                                    std_quantity=n_nodes * entropy_between_peaks.var(0),
                                    ylabel_std_quantity=r"$\mathbf{N \cdot Var}$",
                                    figsize=(8, 5),
                                    # x_ticks=r_[::6],
-                                   x_ticks=[0, .35, 1, 1.5, 2],
+                                   x_ticks=x_ticks_for_plots,
+                                   minor_ticks=[1],
                                    color='black',
                                    marker='o',
+                                   fontsize_ticks=30,
+                                   fontsize_labels=32,
+                                   # fontsize_legend_title=30,
                                    fig_name='between_critical_entropy',
                                    fig_format=args.fig_format,
                                    ylabel=r'$\mathbf{S^{(1)}_{peak} - S^{(2)}_{peak}}$',
                                    save_dir=save_fig_spectrum,
                                    )
 
-    plot_quantity_along_transition(r_=r_, quantity=critical_entropy_lastpeak, figsize=(8, 5),
+    plot_quantity_along_transition(r_=r_,
+                                   quantity=critical_entropy_lastpeak,
+                                   figsize=(8, 5),
                                    x_ticks=r_[::4],
                                    color='green',
                                    marker='o',
@@ -335,18 +342,20 @@ if  __name__ == "__main__":
                                     vmax=1.3,
                                     networks_eta=chi.mean(axis=0).T,
                                     fig_name='specific_heat',
-                                    add_yticks_heat=[np.log10(10), np.log10(100), np.log10(1000), np.log10(10000), np.log10(100000)],
                                     y_label='C',
                                     save_dir=save_fig_spectrum,
                                     figsize=(8, 5),
                                     title='',
                                     num_xticks=len(r_) // 2,
                                     # tau_lim=(.1, 1e6),
-                                    tau_lim=(.01, 1e6),
-                                    x_ticks=r_[::4],
-                                    cbar_ticks=[0, chi.max()],
                                     number_of_curves=10,
-                                    heat_num_yticks=2,
+                                    tau_lim=(.01, 1e6),
+                                    x_ticks=x_ticks_for_plots,
+                                    cbar_ticks=[0, 1.3, .66],
+                                    heat_num_yticks=1,
+                                    add_yticks_heat=[1.],
+                                    # add_yticks_heat=[np.log10(10), np.log10(100), np.log10(1000), np.log10(10000),
+                                    #                  np.log10(100000)],
                                     ticks_size=20,
                                     label_size=30,
                                     fig_format=args.fig_format,
@@ -535,6 +544,8 @@ if  __name__ == "__main__":
     # tau_firstpeak_ph = savgol_filter(tau_firstpeak, polyorder=3, window_length=box_pts)
     tau_lastpeak_ph = tau_lastpeak
     tau_firstpeak_ph = tau_firstpeak
+
+
     figsize = (8, 6)
     fig, ax = plt.subplots(figsize=figsize, tight_layout=True)  # Change layout to tight_layout
     ax.fill_between(r_, y1=tau_firstpeak_ph, y2=tau_lastpeak_ph, color='mediumaquamarine', alpha=.6)
@@ -545,13 +556,48 @@ if  __name__ == "__main__":
     ax.scatter(r_, np.array(tau_firstpeak_ph), label=r'$\tau^{(1)}_{peak}$', c='blue', alpha=.4, lw=5)
 
     ax.set_yscale('log')
+    label_size = 30
+    ticks_size = 25
     # ax.set_xscale('log')
-    ax.set_xlabel('r')
-    ax.set_ylabel(r'$\mathbf{\tau}$')
+    set_ticks_label(ax=ax, ax_type='y',
+                    # data=np.log10(tau_range),
+                    data=tau_range,
+                    num=2,
+                    add_ticks=[1],
+                    # valfmt=valfmt_y,
+                    ticks=None,
+                    only_ticks=False,
+                    tick_lab=None,
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
+                    label_pad=.1,
+                    ax_label=r'$\mathbf{\tau}$',
+                    scale=None,
+                    )
+    # Customize tick parameters for larger and longer ticks on both axes
+    ax.tick_params(axis='both', which='major', length=10, width=2)  # Major ticks
+    ax.tick_params(axis='both', which='minor', length=5, width=1.5)  # Minor ticks
+    ax.get_xaxis().set_major_formatter(ticker.LogFormatterMathtext(base=10))  # Use scalar format for readability
+
+    set_ticks_label(ax=ax, ax_type='x',
+                    # data=np.log10(tau_range),
+                    data=r_,
+                    valfmt="{x:.1f}",
+                    ticks=x_ticks_for_plots,
+                    only_ticks=False, tick_lab=None,
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
+                    label_pad=.1,
+                    ax_label=r'$\mathbf{r}$',
+                    scale=None,
+                    add_ticks=[])
+
+    # ax.set_xlabel('r')
+    # ax.set_ylabel(r'$\mathbf{\tau}$')
     if y_lim:
         ax.set_ylim(10**-1, y_lim[1])
     ax.set_xlim(left=r_[0], right=r_[-1])
-    get_set_larger_ticks_and_labels(ax=ax, num_ticks_x=10)
+    # get_set_larger_ticks_and_labels(ax=ax, num_ticks_x=10)
     # set_legend(ax=ax)
     plt.savefig(save_fig_spectrum + 'phase_diagram.png', dpi=300)
     # plt.show()

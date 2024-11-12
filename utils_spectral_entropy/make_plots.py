@@ -68,11 +68,11 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
                          ylim_ax2=(-.01, 1.5),
                          valfmt_spec_entropy="{x:.1f}",
                          valfmt_spec_heat="{x:.2f}",
-                         fontsize_ticks=20,
-                         fontsize_labels=35,
-                         fontsize_legend_title=30,
+                         fontsize_ticks=30,
+                         fontsize_labels=40,
+                         fontsize_legend_title=35,
                          ticks_spec_heat=[.5, .66, 1],
-                         x_ticks=[10**0, 10**3, 10**6],
+                         x_ticks=[10, 10**5],
                          grid_flag=False,
                          ):
 
@@ -138,7 +138,8 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
                     valfmt=valfmt_spec_entropy,
                     fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
                     fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
-                    data=tau_range)
+                    data=tau_range,
+                    label_pad=.1)
     # Customize tick parameters for larger and longer ticks on both axes
     ax1.tick_params(axis='both', which='major', length=10, width=2)  # Major ticks
     ax1.tick_params(axis='both', which='minor', length=5, width=1.5)  # Minor ticks
@@ -146,7 +147,8 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
 
     # plt.title(tau_star)
     if grid_flag:
-        ax1.grid(True, which='both', axis='x')
+        ax2.grid(True, which='both', axis='y')
+
     set_legend(ax=ax1, title=legend_title, fontsize=fontsize_ticks, title_fontsize=fontsize_legend_title)
 
     # plt.show()
@@ -246,19 +248,20 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                                     linewidth: float = 4,
                                     num_xticks: int = 6,
                                     vline=True,
-                                   number_of_curves: int = 6,
-                                   show: bool=False,
-                                   vmax=None, vmin=None,
-                                   fig_name: str = 'eta',
-                                   y_label: str = r'$\mathbf{\eta}$',
-                                   add_yticks_heat=[],
-                                   heat_num_yticks=5,
-                                   valfmt_cbar="{x:.2f}",
-                                   x_ticks=np.arange(0.1, .9, .1),
-                                   valfmt_x = "{x:.1f}",
+                                    number_of_curves: int = 6,
+                                    show: bool=False,
+                                    vmax=None, vmin=None,
+                                    fig_name: str = 'eta',
+                                    y_label: str = r'$\mathbf{\eta}$',
+                                    add_yticks_heat=[],
+                                    heat_num_yticks=5,
+                                    valfmt_cbar="{x:.2f}",
+                                    x_ticks=np.arange(0.1, .9, .1),
+                                    valfmt_x = "{x:.1f}",
                                     valfmt_y="{x:.1f}",
                                     cbar_ticks=None,
                                     legend_loc=4,
+                                    legend_flag=True,
                                     ticks_size: float = 35,
                                     label_size: float = 40
                                     ):
@@ -306,7 +309,9 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     scale=None,
                     add_ticks=[])
     # get_set_larger_ticks_and_labels(ax=ax1, num_ticks_x=num_xticks)
-    create_colorbar(fig=fig, ax=ax1, mapp=map,
+    create_colorbar(fig=fig,
+                    ax=ax1,
+                    mapp=map,
                     array_of_values=np.clip(networks_eta[tau_mask], a_max=vmax, a_min=networks_eta[tau_mask].min()),
                     # array_of_values=networks_eta,
                     valfmt=valfmt_cbar,
@@ -325,29 +330,50 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
     fig = plt.figure(figsize=figsize, layout='tight')
     ax2 = plt.subplot(1, 1, 1)
     ax2 = plot_eta_curves(tau_range=tau_range,
-                         networks_eta=networks_eta,
+                          networks_eta=networks_eta,
                           r=r,
                           vline=vline,
-                         tau_stars=tau_stars,
-                         tau_lim=tau_lim,
+                          tau_stars=tau_stars,
+                          tau_lim=tau_lim,
                           linewidth=linewidth,
-                         cmap_name=cmap_curves_name,
-                         number_of_curves=number_of_curves,
-                         ax=ax2,
+                          cmap_name=cmap_curves_name,
+                          number_of_curves=number_of_curves,
+                          ax=ax2,
                           legend_loc=legend_loc,
-                         num_xticks=num_xticks)
-    ax2.grid(True, which='both', axis='x')
-    ax2.set_ylabel(y_label)
-    set_ticks_label(ax=ax2, ax_type='x',
+                          num_xticks=num_xticks,
+                          legend_flag=legend_flag)
+    # ax2.grid(True, which='both', axis='x')
+    # ax2.set_ylabel(y_label)
+
+    set_ticks_label(ax=ax2,
+                    ax_type='y',
+                    # data=np.log10(tau_range),
+                    data=networks_eta[tau_mask],
+                    num=2,
+                    valfmt="{x:.1f}",
+                    only_ticks=False,
+                    tick_lab=None,
+                    label_pad=4,
+                    ax_label=y_label,
+                    fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    scale=None,
+                    add_ticks=[])
+
+    set_ticks_label(ax=ax2,
+                    ax_type='x',
                     # data=np.log10(tau_range),
                     data=x_ticks,
                     num=5,
                     valfmt=valfmt_x,
                     ticks=x_ticks,
-                    only_ticks=False, tick_lab=None,
-                    fontdict_ticks_label={'weight': 'bold', 'size': 'x-large'}, label_pad=4,
+                    only_ticks=False,
+                    tick_lab=None,
+                    label_pad=4,
                     ax_label=r'$\mathbf{r}$',
-                    fontdict_label={'weight': 'bold', 'size': 'xx-large', 'color': 'black'}, scale=None,
+                    fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    scale=None,
                     add_ticks=[])
     plt.savefig('{:s}/curves_{:s}.{:s}'.format(save_dir, fig_name, fig_format), dpi=300)
     # get_set_larger_ticks_and_labels(ax=ax2, num_ticks_x=num_xticks)
@@ -374,7 +400,8 @@ def plot_eta_curves(tau_range: np.array,
                     legend_loc=4,
                     number_of_curves: int=6,
                     ylabel: str=r'$\mathbf{\eta}$',
-                    vline: bool=True) -> None:
+                    vline: bool=True,
+                    legend_flag: bool=True) -> None:
 
     if ax:
         pass
@@ -414,7 +441,8 @@ def plot_eta_curves(tau_range: np.array,
             ax.axvline(r[np.argmax(networks_eta[ind])], color=color, linestyle='--', linewidth=linewidth, alpha=.6)
         # print(r'tau={:.1f}, r_max={:.1f}'.format(tau, r[np.argmax(networks_eta[ind])]))
 
-    set_legend(ax=ax, loc=legend_loc, title=r'$\mathbf{\tau}$', ncol=2)
+    if legend_flag:
+        set_legend(ax=ax, loc=legend_loc, title=r'$\mathbf{\tau}$', ncol=2)
     # ax.set_ylim(bottom=0, top=.6)
     ax.set_xlabel(r'$\mathbf{r}$')
     # get_set_larger_ticks_and_labels(ax=ax, num_ticks_x=num_xticks)
@@ -638,8 +666,21 @@ def plot_surface(z,
         plt.close()
 
 
-def plot_tau_vs_r(r_, tau_lastpeak, tau_firstpeak, spectrum, show: bool=False, save_dir: str='', fig_format: str='png',
-                  y_lim=None):
+def plot_tau_vs_r(r_,
+                  tau_lastpeak,
+                  tau_firstpeak,
+                  spectrum,
+                  show: bool=False,
+                  save_dir: str='',
+                  fig_format: str='png',
+                  y_lim=None,
+                  fontsize_ticks=20,
+                  fontsize_labels=35,
+                  x_ticks=None,
+                  fontsize_legend_title=30,
+                  valfmt_x="{x:.2f}",
+                  flag_legend: bool=True
+                  ):
     tau_of_lastpeak_list = np.array(tau_lastpeak)
     # Compute the average first non-zero eigenvalue of the Laplacian
     min_lambda = np.array([np.sort(spectrum[:, i].squeeze(), axis=1)[:, 1] for i in range(spectrum.shape[1])])
@@ -661,19 +702,43 @@ def plot_tau_vs_r(r_, tau_lastpeak, tau_firstpeak, spectrum, show: bool=False, s
                 alpha=.4,
                 c='red')
     ax.set_yscale('log')
+    set_ticks_label(ax=ax,
+                    ax_type='y',
+                    ticks=[10, y_lim[1]],
+                    ax_label=r'$\mathbf{\tau}$',
+                    valfmt=valfmt_x,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    data=tau_diff_avg)
+    # Customize tick parameters for larger and longer ticks on both axes
+    ax.tick_params(axis='both', which='major', length=10, width=2)  # Major ticks
+    ax.tick_params(axis='both', which='minor', length=5, width=1.5)  # Minor ticks
+    ax.get_yaxis().set_major_formatter(ticker.LogFormatterMathtext(base=10))  # Use scalar format for readability
+
     # ax.set_xscale('log')
-    ax.set_xlabel('r')
-    ax.set_ylabel(r'$\mathbf{\tau}$')
+    # ax.set_xlabel('r')
+    # ax.set_ylabel(r'$\mathbf{\tau}$')
     if y_lim:
         ax.set_ylim(y_lim[0], y_lim[1])
-    get_set_larger_ticks_and_labels(ax=ax, num_ticks_x=10)
-    set_legend(ax=ax)
-    plt.grid()
+    # get_set_larger_ticks_and_labels(ax=ax, num_ticks_x=10)
+    set_ticks_label(ax=ax,
+                    ax_type='x',
+                    ticks=x_ticks if x_ticks else None,
+                    ax_label="r",
+                    valfmt=valfmt_x,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    data=r_)
+    if flag_legend:
+        set_legend(ax=ax, fontsize="xx-large")
+    # plt.grid()
     plt.savefig(f'{save_dir}/tau_vs_r.{fig_format}')
     if show:
         plt.show()
     else:
         plt.close()
+
+    ####################################################################################################################
 
     figsize = (6, 5)
     fig, ax = plt.subplots(figsize=figsize, tight_layout=True)  # Change layout to tight_layout
@@ -718,7 +783,8 @@ def plot_quantity_along_transition(quantity,
                                    fig_format: str='png',
                                    marker_size: float=45,
                                    y_lim=(0, 1),
-                                   x_ticks=None):
+                                   x_ticks=None,
+                                   minor_ticks=None):
     if x_ticks is None:
         x_ticks = r_[::2]
 
@@ -752,6 +818,12 @@ def plot_quantity_along_transition(quantity,
                     ax_label=r'$\mathbf{r}$',
                     scale=None,
                     add_ticks=[])
+    if minor_ticks is not None:
+        # Enable minor ticks
+        ax.minorticks_on()
+        # Set minor ticks at specific x-values, e.g., add a minor tick at x=2.5
+        ax.set_xticks(minor_ticks, minor=True)
+
     if std_quantity is None:
         pass
     else:
