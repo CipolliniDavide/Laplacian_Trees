@@ -150,7 +150,6 @@ if  __name__ == "__main__":
                    eigenwhat='eigenvalues',
                    index_to_plot=index_to_plot,
                    save_path=save_fold,
-
                    figname='laplacian_{:s}'.format(key),
                    figsize=(5, 4),
                    # title='laplacian {:s}'.format(key),

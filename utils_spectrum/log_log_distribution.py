@@ -77,7 +77,7 @@ def plot_log_log_distribution(size_cc,
                 slope, intercept = find_power_law_exponent(x_val, y_val)
 
             ax.plot(x_val, intercept * np.array(x_val) ** slope, '--', markersize=3, c=cmap(c), alpha=.6)
-            ax.text(0.05, 0.5 - i * .1, r'$\tau$' + f'(r={N[i]})= {slope:.3f}',
+            ax.text(0.05, 0.5 - i * .1, r'$\gamma$' + f'(r={N[i]:.2f})= {slope:.3f}',
                     transform=plt.gca().transAxes,
                     fontsize=12,
                     # color='black')

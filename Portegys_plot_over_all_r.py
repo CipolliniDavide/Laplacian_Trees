@@ -28,6 +28,7 @@ from utils_spectral_entropy.make_plots import (plot_von_neumann_ent, plot_thermo
 from utils_spectral_entropy.ensamble_average import ensamble_avarage, ensamble_average_batch
 from utils_degree.degree_distribution import compare_bar_plot
 from utils_spectrum.plot_eigen import plot_eigen, plot_propagator, plot_propagator_eigenvalues
+from utils_spectrum.log_log_distribution import plot_log_log_distribution
 from utils_spectral_entropy.get_tau_max_specific_heat import get_tau_max_specific_heat
 import matplotlib.ticker as ticker
 
@@ -142,6 +143,28 @@ if  __name__ == "__main__":
                    show=args.verbose,
                    reference_curve=ref_c)
         plt.close('all')
+
+    save_pow_law = save_fold+'spec_pow_law/'
+    os.makedirs(name=save_pow_law, exist_ok=True)
+    for ind, _ in enumerate(r_):
+        temp = np.clip(load_key_by_(key_name='spectrum', max_iter=args.max_iter,
+                                    load_dir=save_prop_dir, r_range=(r_.min(), r_.max())),
+                       a_min=0, a_max=np.inf).mean(axis=0)
+        plot_log_log_distribution(size_cc=[temp[ind]],
+                                  N=[r_[ind]],
+                                  x_lim_fit=(1e-3, .5),
+                                  title_leg='r',
+                                  save_dir=save_pow_law,
+                                  fig_name=f'powlaw_{key}_r={r_[ind]:.2f}',
+                                  fig_format=args.fig_format,
+                                  figsize=(5, 4),
+                                  cmap_='inferno',
+                                  # y_lim=(1e-5, 10),
+                                  legend_flag=False,
+                                  make_fit_flag=True if r_[ind] > .4 else False,
+                                  # show=True
+                                  show=args.verbose
+                                  )
 
     a=0
     # key = 'spectrum'
