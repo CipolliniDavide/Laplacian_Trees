@@ -53,7 +53,7 @@ if  __name__ == "__main__":
                         # default=f'{os.getcwd()}//Dataset/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=4000,4000-s=1',
                         type=str, help='Name of dataset_dir.')
     # parser.add_argument('-s_dir', '--save_dir', default=f'{os.getcwd()}/Output/PortegysTree', type=str, help='Name of dataset_dir.')
-    parser.add_argument('-fig_form', '--fig_format', default='png', type=str, help='')
+    parser.add_argument('-fig_form', '--fig_format', default='pdf', type=str, help='')
     parser.add_argument('-sp', '--spectrum_type', default='spectrum', type=str, help='')
     parser.add_argument("-v", "--verbose", action="store_true", help="Suppresses all output if False")
     parser.add_argument("-maxit", '--max_iter', default=50, type=int, help='Maximum number of iterations to include in the dataset')
@@ -545,6 +545,7 @@ if  __name__ == "__main__":
     tau_lastpeak_ph = tau_lastpeak
     tau_firstpeak_ph = tau_firstpeak
 
+    # Phase Diagram
 
     figsize = (8, 6)
     fig, ax = plt.subplots(figsize=figsize, tight_layout=True)  # Change layout to tight_layout
@@ -563,7 +564,7 @@ if  __name__ == "__main__":
                     # data=np.log10(tau_range),
                     data=tau_range,
                     num=1,
-                    add_ticks=[1, 5],
+                    add_ticks=[10, 1e5],
                     # valfmt=valfmt_y,
                     ticks=None,
                     only_ticks=False,
@@ -577,7 +578,7 @@ if  __name__ == "__main__":
     # Customize tick parameters for larger and longer ticks on both axes
     ax.tick_params(axis='both', which='major', length=10, width=2)  # Major ticks
     ax.tick_params(axis='both', which='minor', length=5, width=1.5)  # Minor ticks
-    ax.get_xaxis().set_major_formatter(ticker.LogFormatterMathtext(base=10))  # Use scalar format for readability
+    ax.get_yaxis().set_major_formatter(ticker.LogFormatterMathtext(base=10))  # Use scalar format for readability
 
     set_ticks_label(ax=ax, ax_type='x',
                     # data=np.log10(tau_range),

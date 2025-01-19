@@ -7,6 +7,15 @@ from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap
 
+
+def sci_notation(number):
+    exponent = int(np.floor(np.log10(number)) if number != 0 else 0)
+    coeff = number / (10**exponent)
+    if coeff == 0:
+        return f"{coeff:.0f}"
+    # return f"{coeff:.0f}"+r"$\times10^{:d}$".format(exponent)
+    return f"{coeff:.0f}$\\mathbf{{\\times10^{{{exponent}}}}}$"
+
 def create_n_colors_from_cmap(cmap_name, n):
     cmap = plt.get_cmap(cmap_name)
     colors = [cmap(x) for x in np.linspace(0, 1, n)]
@@ -106,8 +115,18 @@ def create_discrete_colorbar(fig, ax, array_of_values, fontdict_cbar_label=None,
     return fig, ax, cbar_edg, cmap
 
 
-def create_colorbar(fig, ax, mapp, array_of_values, valfmt="{x:.2f}", fontdict_cbar_label=None,
-                    fontdict_cbar_tickslabel=None, fontdict_cbar_ticks=None, position='bottom', cbar_edg_ticks=None):
+def create_colorbar(fig,
+                    ax,
+                    mapp,
+                    array_of_values,
+                    valfmt="{x:.2f}",
+                    fontdict_cbar_label=None,
+                    fontdict_cbar_tickslabel=None,
+                    fontdict_cbar_ticks=None,
+                    position='bottom',
+                    cbar_edg_ticks=None,
+                    sci_ticks: bool=False
+                    ):
     fontdict_cbar_label_standard = {'label': None, 'fontsize': 'xx-large', 'fontweight': 'bold'}
     if fontdict_cbar_label is not None: fontdict_cbar_label_standard.update(fontdict_cbar_label)
 
@@ -135,6 +154,9 @@ def create_colorbar(fig, ax, mapp, array_of_values, valfmt="{x:.2f}", fontdict_c
     if isinstance(valfmt, str):
         valfmt = ticker.StrMethodFormatter(valfmt)
     cbar_edg_ticks_label = [valfmt(i, None) for i in cbar_edg_ticks]#['%.3f' % i for i in cbar_edg_ticks]
+    if sci_ticks:
+        cbar_edg_ticks_label = [sci_notation(number=float(k)) for k in cbar_edg_ticks]
+        fontdict_cbar_tickslabel_standard.update({'fontsize': 'xx-large'})
     cbar_edg.ax.set_yticklabels(cbar_edg_ticks_label, **fontdict_cbar_tickslabel_standard)
     return fig, ax, cbar_edg
 

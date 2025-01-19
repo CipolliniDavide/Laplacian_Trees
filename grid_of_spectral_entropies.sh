@@ -24,7 +24,7 @@ for dir in "${output_directories[@]}"; do
 
   # Create figure S1a depicting a grid 2x4 of manually annotated graphs
   python grid_of_spectral_entropy.py \
-  -lp_img "${root}/Output/png/${dir}/spectrum/vne/" \
+  -lp_img "${root}/OutputTest/png/${dir}/spectrum/vne/" \
   --fig_name "${dir}_fig_vne" \
   -svp "$save_fold" \
   -nc 4 -nr 4 \

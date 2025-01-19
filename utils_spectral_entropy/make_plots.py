@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from helpers.visual_utils import set_ticks_label, set_legend, create_colorbar, get_set_larger_ticks_and_labels
+from helpers.visual_utils import set_ticks_label, set_legend, create_colorbar, get_set_larger_ticks_and_labels, sci_notation
 # from utils_spectral_entropy.utils import find_peaks_indices
 # from utils_spectral_entropy.spectral_entropy_numpy import specific_heat
 import matplotlib.ticker as ticker
@@ -262,6 +262,7 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                                     cbar_ticks=None,
                                     legend_loc=4,
                                     legend_flag=True,
+                                    cbar_sci_ticks: bool=False,
                                     ticks_size: float = 35,
                                     label_size: float = 40
                                     ):
@@ -319,6 +320,7 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     fontdict_cbar_label={'label': y_label, "fontsize": label_size, 'fontweight': 'bold'},
                     fontdict_cbar_tickslabel={"fontsize": ticks_size, 'fontweight': 'bold'},
                     fontdict_cbar_ticks=None,
+                    sci_ticks=cbar_sci_ticks,
                     # fontdict_cbar_label={'label': y_label},
                     # fontdict_cbar_tickslabel=None,
                     # fontdict_cbar_ticks=None,

@@ -184,7 +184,7 @@ def _hierarchy_pos(G, root, width=1., vert_gap=0.2, vert_loc=0, xcenter=0.5, pos
 
 
 if __name__ == '__main__':
-    fig_format = 'png'
+    fig_format = 'pdf'
     load_graph = nx.read_graphml
     save_fold = 'figures_modularity/'
     os.makedirs(save_fold, exist_ok=True)

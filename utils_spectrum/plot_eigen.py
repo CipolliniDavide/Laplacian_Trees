@@ -38,7 +38,7 @@ def plot_eigen(curve_labels: np.array,
         for gt in graph_list_gt:
             eigen_list_of_list.append(eigh(nx.laplacian_matrix(gt).toarray(), eigvals_only=True))
 
-    n_colors = len(curve_labels)
+    n_colors = len(curve_labels) + 2
     cmap_name = cmap
     colors = create_n_colors_from_cmap(cmap_name, n_colors)
 
@@ -77,7 +77,7 @@ def plot_eigen(curve_labels: np.array,
     ax.tick_params(axis='y', which='minor', bottom=False)
     if title:
         ax.set_title(title)
-    plt.grid()
+    # plt.grid()
 
     if save_path is not None:
         plt.savefig(save_path + figname + f'.{fig_format}', dpi=300)

@@ -18,6 +18,7 @@ from utils_spectral_entropy.make_plots import (plot_thermo_trajectory, plot_ther
                                                plot_eta_dS_dF, plot_surface, plot_tau_vs_r, plot_von_neumann_ent)
 from utils_spectral_entropy.ensamble_average import ensamble_avarage
 from utils_spectrum.plot_eigen import plot_eigen
+from utils_spectrum.log_log_distribution import plot_log_log_distribution
 from utils_spectral_entropy.get_tau_max_specific_heat import get_tau_max_specific_heat
 
 
@@ -35,6 +36,8 @@ def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx], idx
+
+
 
 if  __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -133,26 +136,47 @@ if  __name__ == "__main__":
     ############################################ Spectrum ##############################################################
     cmap_curves_name = 'Spectral'
 
-    index_to_plot = [0, 3, 6, 13, -1]
+    # index_to_plot = [0, 3, 6, 13, -1]
     for key in ['spectrum', 'spectrum_rw']: #, 'eigvec', 'eigvec_rw']:
     # for key in ['spectrum']:  # , 'eigvec', 'eigvec_rw']:
         temp = np.clip(load_key_by_(key_name=key, max_iter=args.max_iter,
                                     load_dir=save_prop_dir, r_range=(r_.min(), r_.max())), a_min=0, a_max=np.inf).mean(axis=0)
         if 'rw' in key: ref_c = False
         else: ref_c = True
+        index_to_plot = np.where(np.isin(r_, [0.05, 0.2, 0.35, 0.7, 0.85]))[0]
         plot_eigen(curve_labels=r_,
                    eigen_list_of_list=temp,
+                   cmap="inferno",
                    eigenwhat='eigenvalues',
                    index_to_plot=index_to_plot,
                    save_path=save_fold,
+
                    figname='laplacian_{:s}'.format(key),
-                   figsize=(6, 5),
+                   figsize=(5, 4),
                    # title='laplacian {:s}'.format(key),
                    fig_format=args.fig_format,
                    legend_ncol=2,
                    show=args.verbose,
                    reference_curve=ref_c)
         plt.close('all')
+
+        r_to_plot = [0.65, 0.7, 0.8]
+        index_to_plot = np.where(np.isin(r_, r_to_plot))[0]
+        plot_log_log_distribution(size_cc=[temp[k] for k in index_to_plot],
+                                  N=[r_[k] for k in index_to_plot],
+                                  x_lim_fit=(1e-3, .5),
+                                  title_leg='r',
+                                  save_dir=save_fold,
+                                  fig_name=f'powlaw_{key}',
+                                  fig_format=args.fig_format,
+                                  figsize=(5, 4),
+                                  cmap_='inferno',
+                                  y_lim=(1e-5, 10),
+                                  legend_flag=False,
+                                  make_fit_flag=True,
+                                  # show=True
+                                  # show=args.verbose
+                                  )
 
     a=0
     # key = 'spectrum'
@@ -256,6 +280,7 @@ if  __name__ == "__main__":
                                     tau_lim=(1, 1e6),
                                     number_of_curves=10,
                                     heat_num_yticks=2,
+                                    valfmt_y="{x:.0f}",
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
@@ -264,18 +289,21 @@ if  __name__ == "__main__":
     plot_thermo_trajectory_separate(tau_range=tau_range,
                                     r=r_,
                                     # vmax=-1.3,
+                                    cbar_sci_ticks=True,
                                     networks_eta=F.var(axis=0).T,
                                     fig_name='free_energy_var',
                                     add_yticks_heat=[np.log10(10), np.log10(100)],
                                     y_label='Var(F)',
                                     save_dir=save_fig_spectrum,
-                                    figsize=(8, 5),
+                                    figsize=(8.4, 5),
                                     title='',
                                     num_xticks=len(r_) // 2,
+                                    x_ticks=[.1, .4, .6, .8],
                                     tau_lim=(1, 1e6),
                                     number_of_curves=10,
                                     heat_num_yticks=2,
                                     valfmt_cbar="{x:.3f}",
+                                    valfmt_y="{x:.0f}",
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
@@ -300,6 +328,7 @@ if  __name__ == "__main__":
                                     cbar_ticks=[0, 1.3, .66],
                                     ticks_size=30,
                                     label_size=38,
+                                    valfmt_y="{x:.0f}",
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
@@ -316,9 +345,11 @@ if  __name__ == "__main__":
                                     figsize=(8, 5),
                                     title='',
                                     num_xticks=len(r_) // 2,
+                                    x_ticks=[.1, .4, .6, .8],
                                     tau_lim=(1, 1e5),
                                     number_of_curves=10,
                                     heat_num_yticks=2,
+                                    valfmt_y="{x:.0f}",
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
@@ -338,6 +369,8 @@ if  __name__ == "__main__":
                                     tau_lim=(1, 1e5),
                                     number_of_curves=10,
                                     heat_num_yticks=2,
+                                    x_ticks=[.1, .4, .6, .8],
+                                    valfmt_y="{x:.0f}",
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
@@ -383,7 +416,7 @@ if  __name__ == "__main__":
         # plt.show()
         plot_thermo_trajectory_separate(tau_range=tau_range,
                                         r=r_,
-                                        networks_eta=q_mean_ens_avg.T,
+                                        networks_eta=np.clip(q_mean_ens_avg.T, a_min=0, a_max=1e13) if fig_name=="U" else q_mean_ens_avg.T,
                                         fig_name='ensemble_' + fig_name,
                                         y_label=ylab,
                                         save_dir=save_fig_q,
@@ -391,11 +424,15 @@ if  __name__ == "__main__":
                                         title='',
                                         heat_num_yticks=2,
                                         add_yticks_heat=[np.log10(10), np.log10(100)],
+                                        x_ticks=[.1, .4, .6, .8],
                                         num_xticks=len(r_) // 2,
                                         tau_lim=(1, 1e5),
                                         number_of_curves=10,
+                                        valfmt_y="{x:.0f}",
+                                        valfmt_cbar="{x:.0f}" if fig_name == 'degree' else "{x:.2f}",
                                         fig_format=args.fig_format,
-                                        show=args.verbose
+                                        show=args.verbose,
+                                        # cbar_sci_ticks=True if fig_name=='degree' else False
                                         )
         plot_thermo_trajectory_separate(tau_range=tau_range,
                                         r=r_,
@@ -406,20 +443,25 @@ if  __name__ == "__main__":
                                         y_label=ylab_var,
                                         heat_num_yticks=2,
                                         add_yticks_heat=[np.log10(10), np.log10(100)],
+                                        x_ticks=[.1, .4, .6, .8],
                                         save_dir=save_fig_q,
                                         figsize=(8, 5),
                                         title='',
                                         num_xticks=len(r_) // 2,
                                         tau_lim=(1, 1e5),
+                                        valfmt_y="{x:.0f}",
+                                        valfmt_cbar="{x:.0f}" if fig_name == 'degree' else "{x:.2f}",
                                         number_of_curves=10,
                                         fig_format=args.fig_format,
-                                        show=args.verbose
-                                        # show=True
-                                        )
+                                        show=args.verbose,
+                                        cbar_sci_ticks = True if fig_name == 'degree' else False
+
+        )
         tau_lim_deg = (7., 1e2)
         plot_thermo_trajectory_separate(tau_range=tau_range,
                                         r=r_,
-                                        networks_eta=q_mean_ens_avg.T,
+                                        networks_eta=np.clip(q_mean_ens_avg.T, a_min=0,
+                                                             a_max=1e13) if fig_name == "U" else q_mean_ens_avg.T,
                                         fig_name='ensemble_{:s}_lim={:.1f},{:.1f}'.format(fig_name, tau_lim_deg[0], tau_lim_deg[1]),
                                         y_label=ylab,
                                         save_dir=save_fig_q,
@@ -428,10 +470,14 @@ if  __name__ == "__main__":
                                         add_yticks_heat=[np.log10(10), np.log10(100)],
                                         title='',
                                         num_xticks=len(r_) // 2,
+                                        x_ticks=[.1, .4, .6, .8],
+                                        valfmt_y="{x:.0f}",
+                                        valfmt_cbar="{x:.0f}" if fig_name == 'degree' else "{x:.2f}",
                                         tau_lim=tau_lim_deg,
                                         number_of_curves=10,
                                         fig_format=args.fig_format,
-                                        show=args.verbose
+                                        show=args.verbose,
+                                        # cbar_sci_ticks=True if fig_name == 'degree' else False
                                         )
         plot_thermo_trajectory_separate(tau_range=tau_range,
                                         r=r_,
@@ -445,10 +491,14 @@ if  __name__ == "__main__":
                                         add_yticks_heat=[np.log10(10), np.log10(100)],
                                         title='',
                                         num_xticks=len(r_) // 2,
+                                        x_ticks=[.1, .4, .6, .8],
+                                        valfmt_y="{x:.0f}",
+                                        valfmt_cbar="{x:.0f}" if fig_name == 'degree' else "{x:.2f}",
                                         tau_lim=tau_lim_deg,
                                         number_of_curves=10,
                                         fig_format=args.fig_format,
-                                        show=args.verbose
+                                        show=args.verbose,
+                                        cbar_sci_ticks=True if fig_name == 'degree' else False
                                         )
 
     ########################################################################################################
@@ -823,6 +873,7 @@ if  __name__ == "__main__":
                                         # x_ticks=[.1, r_[np.array(tau_firstpeak) - np.array(tau_lastpeak) == 0][-1] + .1,
                                         #          .8],
                                         x_ticks=[.1, .4, .6, .8],
+                                        valfmt_y="{x:.0f}",
                                         # cbar_ticks=[0, 1.3, .66],
                                         ticks_size=30,
                                         label_size=38,
@@ -899,7 +950,7 @@ if  __name__ == "__main__":
                                     ticks_size=30,
                                     label_size=38,
                                     valfmt_cbar="{x:.0f}",
-                                    legend_flag=False,
+                                    legend_flag=True,
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True

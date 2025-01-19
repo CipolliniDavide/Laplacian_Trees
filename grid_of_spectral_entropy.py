@@ -88,7 +88,7 @@ if __name__ == "__main__":
     elif (args.nrows == 2) & (args.ncols == 6):
         figsize=(12, 4)
     else:
-        figsize = (args.ncols*4+.3, args.nrows*4)
+        figsize = (args.ncols*3.5, args.nrows*2.5)
     print(figsize)
 
     ensure_dir(args.save_path)
