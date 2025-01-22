@@ -44,7 +44,8 @@ def plot_log_log_distribution(size_cc,
                               y_lim=None,
                               title_leg=None,
                               legend_flag: bool=True,
-                              make_fit_flag: bool=False
+                              make_fit_flag: bool=False,
+                              return_exponent: bool = False
                               ):
     cmap = cm.get_cmap(cmap_, len(np.unique(N))+1)
 
@@ -108,4 +109,7 @@ def plot_log_log_distribution(size_cc,
         plt.show()
     else:
         plt.close()
+
+    if return_exponent:
+        return slope
 

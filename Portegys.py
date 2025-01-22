@@ -54,7 +54,7 @@ if  __name__ == "__main__":
     parser.add_argument('-fig_form', '--fig_format', default='png', type=str, help='')
     parser.add_argument('-sp', '--spectrum_type', default='spectrum', type=str, help='')
     parser.add_argument("-v", "--verbose", action="store_true", help="Suppresses all output if False")
-    parser.add_argument("-maxit", '--max_iter', default=10, type=int, help='Maximum number of iterations to include in the dataset')
+    parser.add_argument("-maxit", '--max_iter', default=50, type=int, help='Maximum number of iterations to include in the dataset')
     args = parser.parse_args()
     print(args)
     # print(device)
