@@ -56,7 +56,7 @@ def shadow_intersct_area(r, trade_off, trade_off_error):
 if  __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
     # parser.add_argument('-s_dir', '--save_dir', default=f'{os.getcwd()}/Output/PortegysTree', type=str, help='Name of dataset_dir.')
-    parser.add_argument('-fig_form', '--fig_format', default='png', type=str, help='')
+    parser.add_argument('-fig_form', '--fig_format', default='pdf', type=str, help='')
     parser.add_argument('-sp', '--spectrum_type', default='spectrum', type=str, help='')
     parser.add_argument("-v", "--verbose", action="store_true", help="Suppresses all output if False")
     parser.add_argument("-maxit", '--max_iter', default=50, type=int, help='Maximum number of iterations to include in the dataset')
@@ -283,51 +283,3 @@ if  __name__ == "__main__":
     plt.savefig(f"OutputTest/{args.fig_format}/spectral_dimension_datasets_{number_of_nodes}.{args.fig_format}", dpi=300)
     plt.show()
 
-
-
-
-    a=0
-    # #################################### COMPLEXITY ##################################
-    #
-    # # Path to the train.data file
-    # file_path0 = 'Workspace/data/nist/train.dat'
-    # file_path1 = 'Workspace/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=64186134/train.dat'
-    # file_path2 = 'Workspace/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=3566897019/train.dat'
-    # file_path3 = 'Workspace/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/train.dat'
-    #
-    # datasets = [file_path0, file_path1, file_path2, file_path3]
-    #
-    #
-    # intr_d_list = [[] for _ in range(len(datasets))]
-    # lz_list = [[] for _ in range(len(datasets))]
-    # accuracy_list = []
-    #
-    # for it in range(1):
-    #     for i, f in enumerate(datasets):
-    #         data_train, labels_train = load_dataset_file(f)
-    #         data_te, labels_te = load_dataset_file(f.replace('train', 'test'))
-    #         # lz_complexity = compute_lz_complexity(torch.tensor(data.reshape(-1)))
-    #         intrinsic_dims = compute_intrinsic_dimensions(k=3,
-    #                                                       data=remove_repeated_samples(torch.tensor(data_train,
-    #                                                                                                 dtype=torch.float32)))
-    #         intr_d_list[i].append(intrinsic_dims[::-1])
-    #         # lz_list[i].append(lz_complexity)
-    #         # print(f"Overall Lempel-Ziv Complexity of the dataset: {lz_complexity}")
-    #         print(f"Intrinsic dimension of the dataset: {intrinsic_dims}")
-    #         # Train MLP and get test accuracy
-    #         accuracy = train_mlp(X_train=data_train, X_test=data_te, y_train=labels_train, y_test=labels_te, n_epochs=200)
-    #         accuracy_list.append(accuracy)
-    #         print(f"Test accuracy for dataset {datasets[i]}: {accuracy}")
-    #
-    # intr_d_list = np.array([np.array(l) for l in intr_d_list])
-    # lz_list = np.array([np.array(l) for l in lz_list])
-    #
-    # # Plotting
-    # methods = ['mle_id (avg=False)', 'Intrinsic dimension', r'$log_2$' + '(LZ-complexity)'][1:][::-1]
-    #
-    # # Define an exotic color palette
-    # # colors = sns.color_palette(palette="pastel", n_colors=3)[::-1]
-    # colors = sns.color_palette(n_colors=3)[::-1]
-    # dataset_names = ['NIST', 'MNIST', 'FashionMNIST', 'CIFAR10']
-    #
-    # fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5), tight_layout=True)
