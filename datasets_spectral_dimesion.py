@@ -196,7 +196,8 @@ if  __name__ == "__main__":
         # gamma_list.append(gamma)
 
         ######################## average over r purple interval #########################################
-        r_index_for_avg = np.where((r_ < intersection_x_values.max()) & (r_ > intersection_x_values.min()))[0]
+        r_index_for_avg = np.where((r_ <= intersection_x_values.max()) & (r_ >= intersection_x_values.min()))[0]
+        print(f"Dataset {dataset_name}: r_range", [r_[i] for i in r_index_for_avg])
         if "cifar10" in dataset_name:
             # We remove r=0.35 as gives a gamma value that is visibly an outlier, moreover the
             # trade-off theta is much less teh the remaining r values
@@ -225,7 +226,7 @@ if  __name__ == "__main__":
                                               legend_flag=False,
                                               make_fit_flag=True,
                                               return_exponent=True,
-                                              show=True
+                                              show=False
                                               # show=args.verbose
                                               )
         print(f"Dataset {dataset_name}:")
@@ -243,7 +244,7 @@ if  __name__ == "__main__":
     colors = sns.color_palette(n_colors=3)[::-1]
     dataset_names = ['NIST', 'MNIST', 'FashionMNIST', 'CIFAR10']
 
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6, 5), tight_layout=True)
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6, 4), tight_layout=True)
 
     # plt.errorbar(np.arange(len(ds_path_list)), y=list_spectral_dimension, yerr=list_spectral_dimension_std,  label=r'$2C_0$')
     # plt.scatter(np.arange(len(ds_path_list)), 2*(np.array(gamma_list)+1), c='red', label=r'$2\cdot(\gamma+1)$')
@@ -265,7 +266,7 @@ if  __name__ == "__main__":
         y=2 * (np.array(list_gamma_avg_over_r) + 1),
         yerr=list_gamma_std_over_r,
         fmt="o",
-        label=r'$2\cdot(\gamma+1)$',
+        label=r'$2(\gamma+1)$',
         c="red",
         capsize=6,
         elinewidth=2,

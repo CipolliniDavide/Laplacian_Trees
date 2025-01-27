@@ -408,6 +408,14 @@ if  __name__ == "__main__":
             print("saving U")
             U = q_ensemble
 
+        # U(\tau=0) = 2|E|/N \sim 2 in our case
+        # utemp_zero = (np.exp(-0*spectrum.mean(0)[0])*spectrum.mean(0)[0]).sum()/np.exp(-0*spectrum.mean(0)[0]).sum()
+        # utemp_zero = (np.exp(-0*spectrum.mean(0)[0])*spectrum.mean(0)[0]).sum()/np.exp(-0*spectrum.mean(0)[0]).sum()
+
+        # for beta in [0, 1e15]:
+        #     utemp_infty = (np.exp(-t*spectrum.mean(0)[0])*data.mean(0)[0]).sum()/np.exp(-t*spectrum.mean(0)[0]).sum()
+        #     print(utemp_infty)
+
         q_mean_ens_avg = q_ensemble.mean(axis=0)
         q_var_ens_avg = q_var_ensemble.mean(axis=0)
 
@@ -928,9 +936,9 @@ if  __name__ == "__main__":
 
     if 'cifar10' in save_fig_spectrum:
         # tau_lim = (9, 5e1)
-        tau_lim = (9, 9e1)
+        tau_lim = (9.9, 9e1)
     else:
-        tau_lim = (9, 9e1)
+        tau_lim = (9.9, 9e1)
         # tau_lim = (10, 9e1)
     plot_thermo_trajectory_separate(tau_range=tau_range,
                                     r=r_,
@@ -949,7 +957,7 @@ if  __name__ == "__main__":
                                     ticks_size=30,
                                     label_size=38,
                                     valfmt_cbar="{x:.0f}",
-                                    legend_flag=True,
+                                    legend_flag=False,
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True
