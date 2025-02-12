@@ -52,7 +52,6 @@ if __name__ == "__main__":
     # Parameters
     subset_r = np.arange(r_start, r_stop + r_step, r_step)
     # Set of classes to be included
-    # num_classes = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
     # Convert the string list to an actual list of integers
     num_classes = [list(map(int, arguments.num_classes.split(",")))]
     print(f"Using classes: {num_classes}")
