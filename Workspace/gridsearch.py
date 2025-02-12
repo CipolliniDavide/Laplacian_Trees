@@ -28,7 +28,8 @@ if __name__ == "__main__":
     args.add_argument("-sub", "--subset", type=int, nargs=2, help="Number of samples, i.e. number of nodes in the trees.", default=None)
     args.add_argument("-bin", "--binarize_features", default=1,
                       help="Binarize the features True. Otherwise pixel values [0, 1]", type=int)
-
+    args.add_argument("-nc", "--num_classes", type=str, help="Comma-separated list of classes to include",
+                      default="0,1,2,4,5,6,7,8,9")
     # args.add_argument("-b", "--balance", type=bool, default=True, help="Balance classes in the dataset (only needed it the dataset is built with key --fraction)."),
     args.add_argument("-t", "--timeout", type=int, help="Boom.out process timeout in seconds, stops invalid traversal states", default=120)
     arguments = args.parse_args()
@@ -50,8 +51,12 @@ if __name__ == "__main__":
 
     # Parameters
     subset_r = np.arange(r_start, r_stop + r_step, r_step)
-    num_classes = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]] # Set of classes to be included
-    # num_classes = [[0, 1, 2, 3, 4,]]  # Set of classes to be included
+    # Set of classes to be included
+    # num_classes = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+    # Convert the string list to an actual list of integers
+    num_classes = [list(map(int, arguments.num_classes.split(",")))]
+    print(f"Using classes: {num_classes}")
+
     subset_numbers = [[s_train, s_test]]
     iterations = int(iter_stop - iter_start) #15
 

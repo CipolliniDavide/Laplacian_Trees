@@ -262,6 +262,7 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                                     cbar_ticks=None,
                                     legend_loc=4,
                                     legend_flag=True,
+                                    show_colorbar=True,
                                     cbar_sci_ticks: bool=False,
                                     ticks_size: float = 35,
                                     label_size: float = 40
@@ -289,10 +290,12 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     ticks=None,
                     only_ticks=False,
                     tick_lab=None,
-                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    color_label='white',
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'white'},
                     fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
                     label_pad=4,
-                    ax_label=r'$\mathbf{\log_{10}{\tau}}$',
+                    # ax_label=r'$\mathbf{\log_{10}{\tau}}$',
+                    ax_label='',
                     scale=None,
                     )
 
@@ -303,28 +306,39 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     valfmt=valfmt_x,
                     ticks=x_ticks,
                     only_ticks=False, tick_lab=None,
-                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
+                    color_label='white',
+                    fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'white'},
                     fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
                     label_pad=4,
-                    ax_label=r'$\mathbf{r}$',
+                    # ax_label=r'$\mathbf{r}$',
+                    ax_label='',
                     scale=None,
                     add_ticks=[])
+    ax1.tick_params(axis='both', which='both', width=3, length=7)
+    # # Move labels inside the heat map
+    ax1.text(0.9, 0.1, r'$\mathbf{r}$', transform=ax1.transAxes,
+             color='white', fontsize=label_size, fontweight='bold', va='center', ha='center')
+    #
+    ax1.text(0.08, .6, r'$\mathbf{\log_{10}{\tau}}$', transform=ax1.transAxes,
+             color='white', fontsize=label_size-10, fontweight='bold', va='center', ha='center', rotation=90)
+
     # get_set_larger_ticks_and_labels(ax=ax1, num_ticks_x=num_xticks)
-    create_colorbar(fig=fig,
-                    ax=ax1,
-                    mapp=map,
-                    array_of_values=np.clip(networks_eta[tau_mask], a_max=vmax, a_min=networks_eta[tau_mask].min()),
-                    # array_of_values=networks_eta,
-                    valfmt=valfmt_cbar,
-                    cbar_edg_ticks=cbar_ticks,
-                    fontdict_cbar_label={'label': y_label, "fontsize": label_size, 'fontweight': 'bold'},
-                    fontdict_cbar_tickslabel={"fontsize": ticks_size, 'fontweight': 'bold'},
-                    fontdict_cbar_ticks=None,
-                    sci_ticks=cbar_sci_ticks,
-                    # fontdict_cbar_label={'label': y_label},
-                    # fontdict_cbar_tickslabel=None,
-                    # fontdict_cbar_ticks=None,
-                    position='right')
+    if show_colorbar:
+        create_colorbar(fig=fig,
+                        ax=ax1,
+                        mapp=map,
+                        array_of_values=np.clip(networks_eta[tau_mask], a_max=vmax, a_min=networks_eta[tau_mask].min()),
+                        # array_of_values=networks_eta,
+                        valfmt=valfmt_cbar,
+                        cbar_edg_ticks=cbar_ticks,
+                        fontdict_cbar_label={'label': y_label, "fontsize": label_size, 'fontweight': 'bold'},
+                        fontdict_cbar_tickslabel={"fontsize": ticks_size, 'fontweight': 'bold'},
+                        fontdict_cbar_ticks=None,
+                        sci_ticks=cbar_sci_ticks,
+                        # fontdict_cbar_label={'label': y_label},
+                        # fontdict_cbar_tickslabel=None,
+                        # fontdict_cbar_ticks=None,
+                        position='right')
     plt.savefig('{:s}/heatmap_{:s}.{:s}'.format(save_dir, fig_name, fig_format), dpi=300)
 
 
@@ -346,6 +360,7 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                           legend_flag=legend_flag)
     # ax2.grid(True, which='both', axis='x')
     # ax2.set_ylabel(y_label)
+    ax2.tick_params(axis='both', which='both', width=3, length=7)
 
     set_ticks_label(ax=ax2,
                     ax_type='y',
@@ -356,7 +371,8 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     only_ticks=False,
                     tick_lab=None,
                     label_pad=4,
-                    ax_label=y_label,
+                    # ax_label=y_label,
+                    ax_label='',
                     fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
                     fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
                     scale=None,
@@ -372,17 +388,27 @@ def plot_thermo_trajectory_separate(tau_range: np.array,
                     only_ticks=False,
                     tick_lab=None,
                     label_pad=4,
-                    ax_label=r'$\mathbf{r}$',
+                    # ax_label=r'$\mathbf{r}$',
+                    ax_label='',
                     fontdict_ticks_label={'weight': 'bold', 'size': ticks_size},
                     fontdict_label={'weight': 'bold', 'size': label_size, 'color': 'black'},
                     scale=None,
                     add_ticks=[])
+    # # Move labels inside the heat map
+    ax2.text(0.95, 0.1, r'$\mathbf{r}$', transform=ax2.transAxes,
+                      color='black', fontsize=label_size, fontweight='bold', va='center', ha='center')
+    #
+    ax2.text(-0.09, .55, y_label, transform=ax2.transAxes,
+                      color='black', fontsize=label_size, fontweight='bold', va='center', ha='center', rotation=90)
+    ax2.set_xlim((r.min()-0.015, r.max() + .015))
+
     plt.savefig('{:s}/curves_{:s}.{:s}'.format(save_dir, fig_name, fig_format), dpi=300)
     # get_set_larger_ticks_and_labels(ax=ax2, num_ticks_x=num_xticks)
     if show:
         plt.show()
     else:
         plt.close()
+
 
 
 

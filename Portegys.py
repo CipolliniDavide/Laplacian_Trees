@@ -42,8 +42,9 @@ def find_nearest(array, value):
 if  __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument('-ds', '--dataset_dir',
-                        # default=f'{os.getcwd()}/Dataset/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1',
-                        default=f'{os.getcwd()}/Dataset/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=3566897019',
+                        # default=f"{os.getcwd()}/Dataset/boom-mnist-k=5-nc=0,1,3,4,5,6,7,8,9-f=2000,2000-s=1",
+                        default=f'{os.getcwd()}/Dataset/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1',
+                        # default=f'{os.getcwd()}/Dataset/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=3566897019',
                         # default=f'{os.getcwd()}/Dataset/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=64186134',
                         # default=f'{os.getcwd()}/Dataset/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=20,20-s=1',
                         # default=f'{os.getcwd()}/Dataset/boom-nist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1',
@@ -54,7 +55,10 @@ if  __name__ == "__main__":
     parser.add_argument('-fig_form', '--fig_format', default='png', type=str, help='')
     parser.add_argument('-sp', '--spectrum_type', default='spectrum', type=str, help='')
     parser.add_argument("-v", "--verbose", action="store_true", help="Suppresses all output if False")
-    parser.add_argument("-maxit", '--max_iter', default=50, type=int, help='Maximum number of iterations to include in the dataset')
+    parser.add_argument("-maxit", '--max_iter', default=10, type=int, help='Maximum number of iterations to include in the dataset')
+    parser.add_argument("-r_max", '--r_max', default=.85, type=float,
+                        help='Maximum value of control parameter r')
+
     args = parser.parse_args()
     print(args)
     # print(device)
@@ -63,7 +67,10 @@ if  __name__ == "__main__":
 
     # Define save dirs
     args.dataset_dir = args.dataset_dir + '/'
-    save_fold = args.dataset_dir.replace('Dataset', 'OutputTest/{:s}/'.format(args.fig_format))
+    save_fold = args.dataset_dir.replace('Dataset',
+                                         # 'OutputAppendix/{:s}/'.format(args.fig_format)
+                                         'OutputShortTau/{:s}/'.format(args.fig_format)
+                                         )
     save_fig_spectrum = f'{save_fold}{args.spectrum_type}/'
     save_fig_spectrum_vne = f'{save_fold}{args.spectrum_type}/vne/'
     ensure_dir(save_fig_spectrum)
@@ -96,14 +103,17 @@ if  __name__ == "__main__":
         ylim_acc = None
 
     plot_algorithmic_accuracy(df=data,
-                              r_range=(0, .85),
+                              r_range=(0, args.r_max),
                               save_dir=save_fold,
                               fig_name='{:s}_alg_efficiency'.format(dataset_name),
                               fig_format=args.fig_format,
-                              fig_size=(18, 4),
-                              x_ticks=[.1, .9],
+                              fig_size=(25, 8),
+                              fig_size_trade_off=(8, 5.5),
+                              x_ticks=[.1, .4, .6, .8],
                               valfmt_x="{x:.1f}",
                               x_tick_every=2,
+                              fontsize_labels=70,
+                              fontsize_ticks=40,
                               show=args.verbose,
                               # show=True,
                               ylim_theta=ylim_theta,
@@ -119,8 +129,9 @@ if  __name__ == "__main__":
 
     # Load and prepare dataset according to limit on R and independent iterations
     df_nw = pd.read_hdf(f'{save_fold}/dataset_nw.h5', key='data').sort_values(by=['R', 'iter'])
-    df_nw = df_nw[(df_nw['R'] < .9) & (df_nw['iter'] < args.max_iter)]
+    # df_nw = df_nw[(df_nw['R'] < .9) & (df_nw['iter'] < args.max_iter)]
     # df_nw = df_nw[(df_nw['R'] < 2) & (df_nw['iter'] < args.max_iter)]
+    df_nw = df_nw[(df_nw['R'] <= args.r_max) & (df_nw['iter'] < args.max_iter)]
 
     r_ = np.unique(df_nw['R'].values)
     # Check that R is equally represented
@@ -199,7 +210,7 @@ if  __name__ == "__main__":
     spectrum = load_key_by_(max_iter=args.max_iter, key_name=args.spectrum_type, load_dir=save_prop_dir, r_range=(r_.min(), r_.max()))
     volume = load_key_by_(max_iter=args.max_iter, key_name='diameter', load_dir=save_prop_dir, r_range=(r_.min(), r_.max()))
     degree = load_key_by_(max_iter=args.max_iter, key_name='degrees', load_dir=save_prop_dir, r_range=(r_.min(), r_.max()))
-
+    print("Spectrum array shape: ", spectrum.shape)
     # Entropy S
     entropy_ensemble = np.zeros(shape=(args.max_iter, len(r_),) + tau_range.shape)
     entropy_var = np.zeros(shape=(args.max_iter, len(r_),) + tau_range.shape)
@@ -220,7 +231,6 @@ if  __name__ == "__main__":
                                                                                                                    r_list=r_,
                                                                                                                    tau_range=tau_range,
                                                                                                                    )
-
     # Loop over each unique eta value to compute the mean for entropy and specific heat
     for idx, r in enumerate(r_):
         plot_von_neumann_ent(von_neumann_ent=entropy_ensemble[:, idx, :].T/entropy_ensemble.max(),
@@ -316,7 +326,7 @@ if  __name__ == "__main__":
                                     add_yticks_heat=[np.log10(10), np.log10(100)],
                                     y_label='C',
                                     save_dir=save_fig_spectrum,
-                                    figsize=(8, 5),
+                                    figsize=(8, 5.5),
                                     title='',
                                     num_xticks=len(r_) // 2,
                                     tau_lim=(1, 1e5),
@@ -325,8 +335,11 @@ if  __name__ == "__main__":
                                     # x_ticks=[.1, r_[np.array(tau_firstpeak)-np.array(tau_lastpeak) == 0][-1]+.1, .6, .8],
                                     x_ticks=[.1, .4, .6, .8],
                                     cbar_ticks=[0, 1.3, .66],
-                                    ticks_size=30,
-                                    label_size=38,
+                                    # ticks_size=30,
+                                    # label_size=38,
+                                    ticks_size=40,
+                                    label_size=70,
+                                    show_colorbar=False,
                                     valfmt_y="{x:.0f}",
                                     fig_format=args.fig_format,
                                     show=args.verbose
@@ -935,16 +948,16 @@ if  __name__ == "__main__":
     # plt.show()
 
     if 'cifar10' in save_fig_spectrum:
-        # tau_lim = (9, 5e1)
-        tau_lim = (9.9, 9e1)
+        tau_lim = (9.9, 1.2e1)
+        # tau_lim = (9.9, 9e1)
     else:
-        tau_lim = (9.9, 9e1)
-        # tau_lim = (10, 9e1)
+        tau_lim = (9.9, 1.2e1)
+        # tau_lim = (9.9, 9e1)
     plot_thermo_trajectory_separate(tau_range=tau_range,
                                     r=r_,
                                     networks_eta=np.clip(a=networks_eta_avg, a_min=0, a_max=1),
                                     save_dir=f'{save_fig_spectrum}/',
-                                    figsize=(8.5, 5.5),
+                                    figsize=(8, 5.5),
                                     title='',
                                     valfmt_y="{x:.2f}",
                                     num_xticks=len(r_) // 2,
@@ -954,10 +967,12 @@ if  __name__ == "__main__":
                                     #          .8],
                                     x_ticks=[.1, .4, .6, .8],
                                     # cbar_ticks=[0, 1],
-                                    ticks_size=30,
-                                    label_size=38,
+                                    # ticks_size=30,
+                                    ticks_size=40,
+                                    label_size=70,
+                                    show_colorbar=True,
                                     valfmt_cbar="{x:.0f}",
-                                    legend_flag=False,
+                                    legend_flag=True,
                                     fig_format=args.fig_format,
                                     show=args.verbose
                                     # show=True

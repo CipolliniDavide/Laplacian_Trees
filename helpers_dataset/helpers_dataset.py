@@ -234,6 +234,7 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
                               ylim_acc =None,
                               fontsize_ticks=20,
                               fontsize_labels=35,
+                              fig_size_trade_off=(8.5, 5.5),
                               fontsize_legend_title=30,
                               ):
 
@@ -275,14 +276,18 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
             ax.set_ylim(ylim_acc)
         # get_set_larger_ticks_and_labels(ax=ax)
         # ax.set_ylabel(lab,  fontsize=fontsize)
-        set_ticks_label(ax=ax, ax_label=lab, valfmt=valfmt_x, ax_type='y', data=grouped_avg[key],
+        set_ticks_label(ax=ax,
+                        ax_label=lab,
+                        valfmt=valfmt_x, ax_type='y', data=grouped_avg[key],
                         num=2,
                         fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
                         fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
                         )
 
         # ax.set_xlabel(r'$\mathbf{r}$', fontsize=fontsize)
-        set_ticks_label(ax=ax, ax_label=r'$\mathbf{r}$', ticks=x_ticks + r[np.argmax(trade_off)], valfmt=valfmt_x, ax_type='x', data=r,
+        set_ticks_label(ax=ax,
+                        ax_label=r'$\mathbf{r}$',
+                        ticks=x_ticks + r[np.argmax(trade_off)], valfmt=valfmt_x, ax_type='x', data=r,
                         fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
                         fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
                         )
@@ -304,6 +309,7 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
     ax.fill_between(r, trade_off - trade_off_error, trade_off + trade_off_error,
                     color='gray', alpha=0.5)  # Add standard error
     ax.axvline(x=r[np.argmax(trade_off)], linestyle='--', linewidth=3, color='red')
+    # ax.axvline(x=r[np.argmax(trade_off+trade_off_error)], linestyle='--', linewidth=3, color='red')
     condition = ((trade_off >= trade_off.max() - trade_off_error[np.argmax(trade_off)]) &
                  (trade_off <= trade_off.max() + trade_off_error[np.argmax(trade_off)]))
     ax.axhspan(ymin=trade_off.max() - trade_off_error[np.argmax(trade_off)],
@@ -367,6 +373,52 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
         plt.show()
     else:
         plt.close()
+
+    ################################################################################
+    # Save only the trade-off plot
+    fig_trade_off, ax_trade_off = plt.subplots(figsize=fig_size_trade_off)
+    ax_trade_off.plot(r, trade_off, linewidth=3, marker='o', color='blue')
+    ax_trade_off.fill_between(r, trade_off - trade_off_error, trade_off + trade_off_error, color='gray', alpha=0.5)
+    ax_trade_off.axvline(x=r[np.argmax(trade_off)], linestyle='--', linewidth=3, color='red')
+    # ax_trade_off.axvline(x=r[np.argmax(trade_off + trade_off_error)], linestyle='--', linewidth=3, color='red')
+
+    # shadow_intersct_area(ax=ax_trade_off, r=r, trade_off=trade_off, trade_off_error=trade_off_error)
+    # ax_trade_off.axhspan(ymin=trade_off.max() - trade_off_error[np.argmax(trade_off)],
+    #            ymax=trade_off.max() + trade_off_error[np.argmax(trade_off)], color='yellow', alpha=.2)
+
+    set_ticks_label(ax=ax_trade_off,
+                    # ax_label="r",
+                    ax_label='',
+                    ticks=x_ticks, # + [r[np.argmax(trade_off)]],
+                    valfmt=valfmt_x,
+                    ax_type='x',
+                    data=r,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    )
+    set_ticks_label(ax=ax_trade_off,
+                    # ax_label=r'$\mathbf{\theta}$',
+                    ax_label='',
+                    valfmt=valfmt_x,
+                    ax_type='y',
+                    ticks=[ylim_theta[0], ylim_theta[1]] if ylim_theta is not None else None,
+                    data=trade_off,
+                    num=2,
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    )
+    # # Move labels inside the heat map
+    ax_trade_off.text(0.15, 0.1, r'$\mathbf{r}$', transform=ax_trade_off.transAxes,
+             color='black', fontsize=fontsize_labels, fontweight='bold', va='center', ha='center')
+    #
+    ax_trade_off.text(-0.09, .55, r'$\mathbf{\theta}$', transform=ax_trade_off.transAxes,
+             color='black', fontsize=fontsize_labels, fontweight='bold', va='center', ha='center', rotation=90)
+    ax_trade_off.tick_params(axis='both', which='both', width=3, length=7)
+    ax_trade_off.set_xlim((r.min()-0.015, r.max() + .015))
+
+    plt.tight_layout()
+    plt.savefig(f'{save_dir}/{fig_name}_trade_off.{fig_format}', dpi=300)
+    plt.close(fig_trade_off)
 
 
 def plot_ntw_properties(r_: np.array, df: pd.DataFrame, save_dir: str = './', show: bool = False,

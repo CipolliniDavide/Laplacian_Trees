@@ -144,10 +144,15 @@ def compute_lz_complexity(data):
 if  __name__ == "__main__":
 
     # # Path to the train.data file
-    file_path0 = 'Workspace/data/nist/train.dat'
-    file_path1 = 'Workspace/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=64186134/train.dat'
-    file_path2 = 'Workspace/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=3566897019/train.dat'
-    file_path3 = 'Workspace/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/train.dat'
+    file_path0 = 'Dataset/boom-nist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/train.dat'
+    file_path1 = 'Dataset/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=64186134/train.dat'
+    file_path2 = 'Dataset/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=3566897019/train.dat'
+    file_path3 = 'Dataset/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/train.dat'
+
+    # file_path0 = 'Workspace/data/nist/train.dat'
+    # file_path1 = 'Workspace/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=64186134/train.dat'
+    # file_path2 = 'Workspace/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=3566897019/train.dat'
+    # file_path3 = 'Workspace/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/train.dat'
 
     datasets = [file_path0, file_path1, file_path2, file_path3]
 
