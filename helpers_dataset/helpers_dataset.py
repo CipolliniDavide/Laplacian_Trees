@@ -234,6 +234,8 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
                               ylim_acc =None,
                               fontsize_ticks=20,
                               fontsize_labels=35,
+                              fontsize_ticks_multiplot=20,
+                              fontsize_labels_multiplot=35,
                               fig_size_trade_off=(8.5, 5.5),
                               fontsize_legend_title=30,
                               ):
@@ -280,16 +282,16 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
                         ax_label=lab,
                         valfmt=valfmt_x, ax_type='y', data=grouped_avg[key],
                         num=2,
-                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
-                        fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks_multiplot},
+                        fontdict_label={'weight': 'bold', 'size': fontsize_labels_multiplot, 'color': 'black'},
                         )
 
         # ax.set_xlabel(r'$\mathbf{r}$', fontsize=fontsize)
         set_ticks_label(ax=ax,
                         ax_label=r'$\mathbf{r}$',
                         ticks=x_ticks + r[np.argmax(trade_off)], valfmt=valfmt_x, ax_type='x', data=r,
-                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
-                        fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                        fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks_multiplot},
+                        fontdict_label={'weight': 'bold', 'size': fontsize_labels_multiplot, 'color': 'black'},
                         )
         # ax.grid(True, which='both', axis='x')
         # set_legend(ax=ax, title=f'r={legend_title}')
@@ -350,8 +352,8 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
                     valfmt=valfmt_x,
                     ax_type='x',
                     data=r,
-                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
-                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks_multiplot},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels_multiplot, 'color': 'black'},
                     )
     set_ticks_label(ax=ax,
                     ax_label=r'$\mathbf{\theta}$',
@@ -360,8 +362,8 @@ def plot_algorithmic_accuracy(df: pd.DataFrame, r_range: tuple=(None, None),
                     ticks=[ylim_theta[0], ylim_theta[1]] if ylim_theta is not None else None,
                     data=trade_off,
                     num=2,
-                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
-                    fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},
+                    fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks_multiplot},
+                    fontdict_label={'weight': 'bold', 'size': fontsize_labels_multiplot, 'color': 'black'},
                     )
 
     # ax.grid(True, which='both', axis='x')
