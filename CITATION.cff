@@ -1,0 +1,22 @@
+cff-version: 1.0.0
+message: "If you use this software, please cite it as below."
+title: "Laplacian Trees"
+version: "1.0.0"
+date-released: 2024-04-27
+authors:
+  - family-names: Cipollini
+    given-names: Davide
+repository-code: https://github.com/CipolliniDavide/Laplacian_Trees
+license: MIT
+keywords:
+  - Laplacian matrices
+  - tree structures
+  - graph theory
+  - thermodynamics
+  - intrinsic dimension
+  - spectral dimension
+  - von Neumann Entropy
+  - fractals
+abstract: |
+  This repository contains the developed and used for the paper Cipollini and Schomaker, 2024, 
+  Tree networks of real-world data: analysis of efficiency and spatiotemporal scales, https://doi.org/10.48550/arXiv.2404.17829.
