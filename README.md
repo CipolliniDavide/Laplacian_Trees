@@ -1,7 +1,10 @@
 
 # Tree networks of real-world data: analysis of efficiency and spatiotemporal scales,
 
-This repository contains the code used in the paper _**Cipollini and Schomaker, 2024, Tree networks of real-world data: analysis of efficiency and spatiotemporal scales, https://doi.org/10.48550/arXiv.2404.17829.**_
+![screenshot](fig5_trees.jpg)
+[Figure from Cipollini et. al., 2025 PRR.]
+
+This repository contains the code used in the paper _**Cipollini and Schomaker, Tree networks of real-world data: analysis of efficiency and spatiotemporal scales, Phys. Rev. Research, 2025, https://doi.org/10.1103/ztmk-glc4.**_
 
 To replicate the results, run:
 ```
