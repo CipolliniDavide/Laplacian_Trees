@@ -1,5 +1,5 @@
 
-# Tree networks of real-world data: analysis of efficiency and spatiotemporal scales,
+# Tree networks of real-world data: analysis of efficiency and spatiotemporal scales
 
 ![screenshot](fig5_trees.jpg)
 
