@@ -1,7 +1,7 @@
 
 # Tree networks of real-world data: analysis of efficiency and spatiotemporal scales
 
-![screenshot](fig5_trees.jpg)
+![screenshot](figures_for_cover/trees.jpg)
 
 [Figure from Cipollini et. al., 2025 PRR.]
 
