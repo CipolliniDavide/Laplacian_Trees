@@ -69,7 +69,7 @@ if  __name__ == "__main__":
     args.dataset_dir = args.dataset_dir + '/'
     save_fold = args.dataset_dir.replace('Dataset',
                                          # 'OutputAppendix/{:s}/'.format(args.fig_format)
-                                         'OutputShortTau/{:s}/'.format(args.fig_format)
+                                         'OutputTest/{:s}/'.format(args.fig_format)
                                          )
     save_fig_spectrum = f'{save_fold}{args.spectrum_type}/'
     save_fig_spectrum_vne = f'{save_fold}{args.spectrum_type}/vne/'
@@ -243,7 +243,8 @@ if  __name__ == "__main__":
                                             tau_range[mask_of_peaks_list[idx]].min()],
                              spec_heat=chi[:, idx, :].T,
                              ylim_ax2=(-.01, 2.),
-                             labely=r'$\mathbf{S_{\tau}}$',
+                             labely=r'$\mathbf{S}$',
+                             C_label="C",
                              take_average=True,
                              legend_title='r={:.2f}'.format(r),
                              show=args.verbose,

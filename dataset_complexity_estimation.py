@@ -155,6 +155,7 @@ if  __name__ == "__main__":
     # file_path3 = 'Workspace/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/train.dat'
 
     datasets = [file_path0, file_path1, file_path2, file_path3]
+    dataset_names = ['NIST', 'MNIST', 'FashionMNIST', 'CIFAR10']
 
     intr_d_list = [[] for _ in range(len(datasets))]
     lz_list = [[] for _ in range(len(datasets))]
@@ -186,7 +187,7 @@ if  __name__ == "__main__":
     # Define an exotic color palette
     # colors = sns.color_palette(palette="pastel", n_colors=3)[::-1]
     colors = sns.color_palette(n_colors=3)[::-1]
-    dataset_names = ['NIST', 'MNIST', 'FashionMNIST', 'CIFAR10']
+
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 5), tight_layout=True)
     bar_width = 0.2
@@ -213,7 +214,7 @@ if  __name__ == "__main__":
     ax2 = ax.twinx()
     ax2.bar(x + bar_width * (len(methods) + 2) / 2, 1 - np.array(accuracy_list),
             width=bar_width, color=colors[-1], label='MLP')
-    ax2.set_ylabel('1- (MLP Accuracy)', c=colors[-1])
+    ax2.set_ylabel('1-(MLP Accuracy)', c=colors[-1])
     ax2.tick_params(axis='y', colors=colors[-1])
     ax2.yaxis.label.set_color(colors[-1])
     get_set_larger_ticks_and_labels(ax=ax2)

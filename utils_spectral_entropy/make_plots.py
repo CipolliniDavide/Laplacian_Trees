@@ -61,7 +61,9 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
                          save_name=None, spec_heat=None,
                          tau_star_list=[],
                          figsize=(7, 5),
-                         labely='S', show=False,
+                         labely='S',
+                         C_label='C',
+                         show=False,
                          fig_format='.pdf',
                          legend_title=None,
                          take_average=False,
@@ -108,13 +110,14 @@ def plot_von_neumann_ent(von_neumann_ent, tau_range,
         # tau_of_lastpeak_list = tau_range[find_peaks_indices(x_array=tau_range, y_array=spec_heat, eps=eps_tau_star, atol=atol)]
         # for t in tau_star_list:
         for t, c in zip(tau_star_list, ['green', 'blue']):
-            ax2.axvline(t, color='purple', linestyle='--', linewidth=2.5, alpha=.5, c=c)
+            ax2.axvline(t, linestyle='--', linewidth=3.5, alpha=.95, c=c)
             # ax3.text(t, ax1.get_ylim()[0], f"{t:.0f}", va='top', ha='center', color='gray')  # Add text box
         # ax2.tick_params(axis='y', labelcolor='red', color='red')
-        ax2.set_ylabel(r'$\mathbf{C_{\tau}}$', color='red')
+        ax2.set_ylabel(C_label, color='red')
         num_ticks_y = 3
         get_set_larger_ticks_and_labels(ax=ax2, num_ticks_y=num_ticks_y)
-        set_ticks_label(ax=ax2, ax_type='y', num=num_ticks_y, data=spec_heat, ax_label=r'$\mathbf{C_{\tau}}$',
+        set_ticks_label(ax=ax2, ax_type='y', num=num_ticks_y, data=spec_heat,
+                        ax_label=C_label,
                         fontdict_ticks_label={'weight': 'bold', 'size': fontsize_ticks},
                         valfmt=valfmt_spec_heat,
                         fontdict_label={'weight': 'bold', 'size': fontsize_labels, 'color': 'black'},

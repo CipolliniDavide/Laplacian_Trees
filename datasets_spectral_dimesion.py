@@ -92,13 +92,14 @@ if  __name__ == "__main__":
                     "./Dataset/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=3566897019/",
                     "./Dataset/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=64186134/",
                     "./Dataset/boom-nist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/"
-                    ][::-1]
+                    ]
 
     # ds_path_list = ["./Dataset/boom-cifar10-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/",
     #                 "./Dataset/boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=4000,4000-s=1/",
     #                 "./Dataset/boom-mnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=4000,4000-s=1/",
     #                 "./Dataset/boom-nist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1/"
     #                 ]
+    dataset_names = ['NIST', 'MNIST', 'FashionMNIST', 'CIFAR10'][::-1]
 
     list_spectral_dimension = []
     list_spectral_dimension_std = []
@@ -242,7 +243,6 @@ if  __name__ == "__main__":
         plt.show()
 
     colors = sns.color_palette(n_colors=3)[::-1]
-    dataset_names = ['NIST', 'MNIST', 'FashionMNIST', 'CIFAR10']
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6, 4), tight_layout=True)
 
@@ -281,6 +281,6 @@ if  __name__ == "__main__":
     get_set_larger_ticks_and_labels(ax=ax)
     set_legend(ax=ax, title='')
     number_of_nodes = ds_path.rsplit('f=')[1].split(",")[0]
-    plt.savefig(f"OutputTest/{args.fig_format}/spectral_dimension_datasets_{number_of_nodes}.{args.fig_format}", dpi=300)
+    plt.savefig(f"Output20May/{args.fig_format}/spectral_dimension_datasets_{number_of_nodes}.{args.fig_format}", dpi=300)
     plt.show()
 

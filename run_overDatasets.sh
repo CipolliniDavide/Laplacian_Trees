@@ -7,7 +7,7 @@ python_script="Portegys.py"
 # Number of times the experiment is replicated
 max_iter=50
 
-fig_format="pdf"
+fig_format="png"
 # Define the list of output directories
 output_directories=(
 #"boom-fashionmnist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=500,500-s=1"

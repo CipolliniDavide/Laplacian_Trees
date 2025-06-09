@@ -17,7 +17,26 @@ from helpers_dataset.helpers_dataset import (order_files_by_r,
                                              convert_tree_to_nx)
 
 import sys
-print(sys.getrecursionlimit())
+
+def modularity_with_gamma(G, communities, gamma=1.0):
+    A = nx.to_numpy_array(G)
+    degrees = A.sum(axis=1)
+    m = A.sum() / 2
+
+    # Build community label vector: community[i] is the label of node i
+    membership = np.zeros(len(G.nodes()), dtype=int)
+    for label, community in enumerate(communities):
+        for node in community:
+            membership[node] = label
+
+    Q = 0.0
+    for i in range(len(G)):
+        for j in range(len(G)):
+            if membership[i] == membership[j]:
+                Q += A[i, j] - gamma * degrees[i] * degrees[j] / (2 * m)
+
+    Q /= (2 * m)
+    return Q
 
 def plot_(x,
           y,
@@ -78,7 +97,7 @@ def plot_(x,
     plt.show()
 
 
-def save_array_modularity(dict_files, vert_gap):
+def save_array_modularity(dict_files, vert_gap, gamma=1):
     print(load_ntw_dir)
     hier = [[] for _ in range(len(r_))]
     modularity = [[] for _ in range(len(r_))]
@@ -100,6 +119,16 @@ def save_array_modularity(dict_files, vert_gap):
                 # if key > .4:
                 #     print(f"r={key}: num comunities {len(communities)}")
                 Q = h.modularity(communities)
+                ###############################################
+                # # Louvain communitieUsed in the paper
+                #                 Q = h.modularity(communities)s
+                # membership = [set(comm) for comm in communities]
+                # # Convert membership for our function
+                # node_groups = [list(comm) for comm in communities]
+                # # Compute modularity with gamma
+                # Q = modularity_with_gamma(G, node_groups, gamma=gamma)
+                # print(f"Modularity with gamma={gamma}: {Q:.4f}")
+                ###################################
                 modularity[i].append(Q)
 
                 try:
@@ -186,7 +215,8 @@ def _hierarchy_pos(G, root, width=1., vert_gap=0.2, vert_loc=0, xcenter=0.5, pos
 if __name__ == '__main__':
     fig_format = 'pdf'
     load_graph = nx.read_graphml
-    save_fold = 'figures_modularity/'
+    gamma=1
+    save_fold = f'figures_modularity_gamma={gamma:03.2f}/'
     os.makedirs(save_fold, exist_ok=True)
 
     vert_gap = 0.2
@@ -222,7 +252,7 @@ if __name__ == '__main__':
         n_nodes[ind] = nodes
 
         # Create the data
-        # save_array_modularity(dict_files=dict_files, vert_gap=vert_gap)
+        save_array_modularity(dict_files=dict_files, vert_gap=vert_gap, gamma=gamma)
 
         avg_modularity_list[ind] = np.load(file=f'{save_fold}/avg_modularity_fashionmnist_nodes{nodes}.npy')
         var_modularity_list[ind] = np.load(file=f'{save_fold}/var_modularity_fashionmnist_nodes{nodes}.npy')
@@ -237,8 +267,8 @@ if __name__ == '__main__':
           fig_format=fig_format,
           # ylabel='Modularity',
           # ylabel_var="$\mathbf{2m\cdot Var(Modularity)}$",
-          ylabel='Q',
-          ylabel_var="$\mathbf{2m\cdot Var(Q)}$",
+          ylabel=r'$\mathbf{Q^\star}$',
+          ylabel_var="$\mathbf{2m\cdot Var(Q^\star)}$",
           x_ticks=[0, .4, .9, 1, 1.5, 2],
           x_lim=(0, .95),
           fontsize_ticks=20,

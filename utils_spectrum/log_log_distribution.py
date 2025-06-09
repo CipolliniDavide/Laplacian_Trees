@@ -90,7 +90,7 @@ def plot_log_log_distribution(size_cc,
 
     # Set labels for axes
     ax.set_xlabel(r'$\mathbf{\lambda}$')
-    ax.set_ylabel(r'$\mathbf{\mathcal{P}(\lambda)}$')
+    ax.set_ylabel(r'$\mathbf{P(\lambda)}$')
 
     if y_lim:
         ax.set_ylim(y_lim) #, bottom=1e-12)
