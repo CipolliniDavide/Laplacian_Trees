@@ -19,7 +19,6 @@ The bash file calls the following scripts:
 - `create_network_dataset.py`
 - `Portegys.py`
 
-
 Before running the bash file: 
 - from the Zenodo download, take the folder `data` and place it in `./Workspace`
 - from the Zenodo download, take the files `data\nist\train.dat` and `data\nist\test.dat` and place them in `Workspace\boom-nist-k=5-nc=0,1,2,3,4,5,6,7,8,9-f=2000,2000-s=1`
